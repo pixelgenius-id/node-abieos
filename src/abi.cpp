@@ -40,39 +40,7 @@ template <typename F>
 constexpr void for_each_abi_type(F f) {
     static_assert(sizeof(float) == 4);
     static_assert(sizeof(double) == 8);
-
-    using namespace ::abieos;
-    f((bool*)nullptr);
-    f((int8_t*)nullptr);
-    f((uint8_t*)nullptr);
-    f((int16_t*)nullptr);
-    f((uint16_t*)nullptr);
-    f((int32_t*)nullptr);
-    f((uint32_t*)nullptr);
-    f((int64_t*)nullptr);
-    f((uint64_t*)nullptr);
-    f((int128*)nullptr);
-    f((uint128*)nullptr);
-    f((varuint32*)nullptr);
-    f((varint32*)nullptr);
-    f((float*)nullptr);
-    f((double*)nullptr);
-    f((float128*)nullptr);
-    f((time_point*)nullptr);
-    f((time_point_sec*)nullptr);
-    f((block_timestamp*)nullptr);
-    f((name*)nullptr);
-    f((bytes*)nullptr);
-    f((std::string*)nullptr);
-    f((checksum160*)nullptr);
-    f((checksum256*)nullptr);
-    f((checksum512*)nullptr);
-    f((public_key*)nullptr);
-    f((private_key*)nullptr);
-    f((signature*)nullptr);
-    f((symbol*)nullptr);
-    f((symbol_code*)nullptr);
-    f((asset*)nullptr);
+    std::apply([&f](auto&& ...t) { (f(&t), ...); }, basic_abi_types{});
 }
 
 abi_type* get_type(std::map<std::string, abi_type>& abi_types,
@@ -188,6 +156,8 @@ void eosio::convert(const abi_def& abi, eosio::abi& c) {
         c.action_types[a.name] = a.type;
     for (auto& t : abi.tables)
         c.table_types[t.name] = t.type;
+    for (auto& r : abi.action_results.value)
+        c.action_result_types[r.name] = r.result_type;
     for_each_abi_type([&](auto* p) {
         const char* name = get_type_name(p);
         c.abi_types.try_emplace(name, name, abi_type::builtin{}, &abi_serializer_for<std::decay_t<decltype(*p)>>);
@@ -222,6 +192,13 @@ void eosio::convert(const abi_def& abi, eosio::abi& c) {
     }
     for (auto& [_, t] : c.abi_types) {
         fill(c.abi_types, t, 0);
+    }
+
+    for (const auto& [key, val] : abi.kv_tables.value) {
+        std::vector<char> bytes;
+        eosio::vector_stream strm(bytes);
+        to_json(val, strm);
+        c.kv_tables.try_emplace(key, bytes.begin(), bytes.end());
     }
 }
 

@@ -9,6 +9,7 @@
 #include <optional>
 #include <rapidjson/encodings.h>
 #include <variant>
+#include <map>
 
 namespace eosio {
 
@@ -87,24 +88,55 @@ void to_json(bool value, S& stream) {
       stream.write("false", 5);
 }
 
-template <typename T, typename S>
-void int_to_json(T value, S& stream) {
-   auto                                               uvalue = std::make_unsigned_t<T>(value);
-   small_buffer<std::numeric_limits<T>::digits10 + 4> b;
-   bool                                               neg = value < 0;
+template <typename T>
+struct make_unsigned : std::make_unsigned<T> {};
+
+#ifndef ABIEOS_NO_INT128
+// some standard library does not support std::make_unsigned<__int128> yet. 
+template <>
+struct make_unsigned<__int128> {
+   using type = unsigned __int128;
+};
+
+template <>
+struct make_unsigned<unsigned __int128> {
+   using type = unsigned __int128;
+};
+#endif
+
+template <typename T>
+using make_unsigned_t = typename make_unsigned<T>::type;
+
+template <typename T>
+char* int_to_decimal(T value, char* buffer) {
+   char* pos = buffer;
+   auto uvalue = make_unsigned_t<T>(value);
+   bool neg    = value < 0;
    if (neg)
       uvalue = -uvalue;
-   if (sizeof(T) > 4)
-      *b.pos++ = '"';
+   
    do {
-      *b.pos++ = '0' + (uvalue % 10);
+      *pos++ = '0' + (uvalue % 10);
       uvalue /= 10;
    } while (uvalue);
+
    if (neg)
-      *b.pos++ = '-';
+      *pos++ = '-';
+   std::reverse(buffer, pos);
+   return pos;
+}
+
+template <typename T, typename S>
+void int_to_json(T value, S& stream) {
+   // For older versions of libstdc++ (g++ version 9 and below) std::numeric_limits<__int128>::digits10 
+   // would return 0 when compiling with -std=c++17 flag
+   const int num_digits = sizeof(T) == 16 ? 38 : std::numeric_limits<T>::digits10;
+   small_buffer<num_digits + 4> b;
    if (sizeof(T) > 4)
       *b.pos++ = '"';
-   b.reverse();
+   b.pos = int_to_decimal(value, b.pos);
+   if (sizeof(T) > 4)
+      *b.pos++ = '"';
    stream.write(b.data, b.pos - b.data);
 }
 
@@ -165,6 +197,29 @@ void to_json(const std::vector<T>& obj, S& stream) {
       write_newline(stream);
    }
    stream.write(']');
+}
+
+template <typename K, typename V, typename S>
+void to_json(const std::map<K, V>& obj, S& stream) {
+   stream.write('{');
+   bool first = true;
+   for (const auto& [k,v] : obj) {
+      if (first) {
+         increase_indent(stream);
+      } else {
+         stream.write(',');
+      }
+      write_newline(stream);
+      first = false;
+      to_json(k, stream);
+      stream.write(':');
+      to_json(v, stream);
+   }
+   if (!first) {
+      decrease_indent(stream);
+      write_newline(stream);
+   }
+   stream.write('}');
 }
 
 template <typename T, typename S>

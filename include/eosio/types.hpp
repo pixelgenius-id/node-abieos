@@ -34,15 +34,15 @@ constexpr const char* get_type_name(long double*) { return "float128"; }
 template <std::size_t N, std::size_t M>
 constexpr std::array<char, N + M> array_cat(std::array<char, N> lhs, std::array<char, M> rhs) {
    std::array<char, N + M> result{};
-   for (int i = 0; i < N; ++i) { result[i] = lhs[i]; }
-   for (int i = 0; i < M; ++i) { result[i + N] = rhs[i]; }
+   for (std::size_t i = 0; i < N; ++i) { result[i] = lhs[i]; }
+   for (std::size_t i = 0; i < M; ++i) { result[i + N] = rhs[i]; }
    return result;
 }
 
 template <std::size_t N>
 constexpr std::array<char, N> to_array(std::string_view s) {
    std::array<char, N> result{};
-   for (int i = 0; i < N; ++i) { result[i] = s[i]; }
+   for (std::size_t i = 0; i < N; ++i) { result[i] = s[i]; }
    return result;
 }
 
@@ -89,9 +89,15 @@ constexpr auto get_variant_type_name() {
 template <typename... T>
 constexpr auto variant_type_name = get_variant_type_name<T...>();
 
+} // namespace eosio
+
+namespace std {
+// For all the types defined in ship_protocal.hpp, it relies on the argument-dependent name lookup
+// to work; that is, the get_type_name() should be defined in the namespace which is the same namespace of
+// the first argument. For variant, it is defined in the namespace; therefore, we need to define get_type_name()
+// in the std namespace.
 template <typename... T>
 constexpr const char* get_type_name(std::variant<T...>*) {
-   return variant_type_name<T...>.data();
+   return eosio::variant_type_name<T...>.data();
 }
-
-} // namespace eosio
+}

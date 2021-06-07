@@ -75,12 +75,6 @@ namespace eosio { namespace ship_protocol {
       report_error("unknown status: " + s);
    }
 
-   template <typename S>
-   void to_json(const transaction_status& status, S& stream) {
-      // todo: switch to new serializer string support.
-      return eosio::to_json(to_string(status), stream);
-   }
-
    struct get_status_request_v0 {};
 
    EOSIO_REFLECT(get_status_request_v0)
@@ -105,6 +99,8 @@ namespace eosio { namespace ship_protocol {
    EOSIO_REFLECT(get_status_result_v0, head, last_irreversible, trace_begin_block, trace_end_block,
                  chain_state_begin_block, chain_state_end_block, chain_id)
 
+   // When using `get_blocks_request_v1`, `get_blocks_result_v0` will be returned for EOS version 2.0.x and before and
+   // `get_blocks_result_v1` will be returned for EOS version 2.1 RC bug not stable. 
    struct get_blocks_request_v0 {
       uint32_t                    start_block_num        = {};
       uint32_t                    end_block_num          = {};
@@ -119,13 +115,20 @@ namespace eosio { namespace ship_protocol {
    EOSIO_REFLECT(get_blocks_request_v0, start_block_num, end_block_num, max_messages_in_flight, have_positions,
                  irreversible_only, fetch_block, fetch_traces, fetch_deltas)
 
+   // When using `get_blocks_request_v1`, only `get_blocks_result_v2` will be returned
+   struct get_blocks_request_v1 : get_blocks_request_v0 {
+      bool                        fetch_block_header = {};
+   };
+
+   EOSIO_REFLECT(get_blocks_request_v1, base get_blocks_request_v0, fetch_block_header)
+
    struct get_blocks_ack_request_v0 {
       uint32_t num_messages = {};
    };
 
    EOSIO_REFLECT(get_blocks_ack_request_v0, num_messages)
 
-   using request = std::variant<get_status_request_v0, get_blocks_request_v0, get_blocks_ack_request_v0>;
+   using request = std::variant<get_status_request_v0, get_blocks_request_v0, get_blocks_ack_request_v0, get_blocks_request_v1>;
 
    struct get_blocks_result_base {
       block_position                head              = {};
@@ -144,21 +147,35 @@ namespace eosio { namespace ship_protocol {
 
    EOSIO_REFLECT(get_blocks_result_v0, base get_blocks_result_base, block, traces, deltas)
 
-   struct row {
-      bool                present = {};
+   struct row_v0 {
+      bool                present = {};     // false (not present), true (present, old / new)
       eosio::input_stream data    = {};
    };
 
-   EOSIO_REFLECT(row, present, data)
+   EOSIO_REFLECT(row_v0, present, data)
 
    struct table_delta_v0 {
-      std::string      name = {};
-      std::vector<row> rows = {};
+      std::string         name = {};
+      std::vector<row_v0> rows = {};
    };
 
    EOSIO_REFLECT(table_delta_v0, name, rows)
 
-   using table_delta = std::variant<table_delta_v0>;
+   struct row_v1 {
+      uint8_t             present = {};     // 0 (not present), 1 (present, old), 2 (present, new)
+      eosio::input_stream data    = {};
+   };
+
+   EOSIO_REFLECT(row_v1, present, data)
+
+   struct table_delta_v1 {
+      std::string         name = {};
+      std::vector<row_v1> rows = {};
+   };
+
+   EOSIO_REFLECT(table_delta_v1, name, rows)
+
+   using table_delta = std::variant<table_delta_v0, table_delta_v1>;
 
    struct permission_level {
       eosio::name actor      = {};
@@ -323,6 +340,10 @@ namespace eosio { namespace ship_protocol {
       std::optional<account_delta>           account_ram_delta = {};
       std::optional<std::string>             except            = {};
       std::optional<uint64_t>                error_code        = {};
+      // semantically, this should be std::optional<transaction_trace>;
+      // optional serializes as bool[,transaction_trace]
+      // vector serializes as size[,transaction_trace..] but vector will only ever have 0 or 1 transaction trace
+      // This assumes that bool and size for false/true serializes to same as size 0/1
       std::vector<recurse_transaction_trace> failed_dtrx_trace = {};
       std::optional<partial_transaction>     partial           = {};
    };
@@ -335,21 +356,6 @@ namespace eosio { namespace ship_protocol {
    struct recurse_transaction_trace {
       transaction_trace recurse = {};
    };
-
-   template <typename S>
-   void to_bin(const recurse_transaction_trace& obj, S& stream) {
-      return to_bin(obj.recurse, stream);
-   }
-
-   template <typename S>
-   void from_bin(recurse_transaction_trace& obj, S& stream) {
-      return from_bin(obj.recurse, stream);
-   }
-
-   template <typename S>
-   void to_json(const recurse_transaction_trace& obj, S& stream) {
-      return to_json(obj.recurse, stream);
-   }
 
    struct producer_key {
       eosio::name       producer_name     = {};
@@ -451,7 +457,17 @@ namespace eosio { namespace ship_protocol {
    };
 
    EOSIO_REFLECT(get_blocks_result_v1, base get_blocks_result_base, block, traces, deltas)
-   using result = std::variant<get_status_result_v0, get_blocks_result_v0, get_blocks_result_v1>;
+
+   struct get_blocks_result_v2 : get_blocks_result_base { 
+      eosio::opaque<signed_block_variant>           block = {};
+      eosio::opaque<signed_block_header>            block_header = {};
+      eosio::opaque<std::vector<transaction_trace>> traces = {};
+      eosio::opaque<std::vector<table_delta>>       deltas = {};
+   };
+
+   EOSIO_REFLECT(get_blocks_result_v2, base get_blocks_result_base, block, block_header, traces, deltas)
+
+   using result = std::variant<get_status_result_v0, get_blocks_result_v0, get_blocks_result_v1, get_blocks_result_v2>;
 
    struct transaction_header {
       eosio::time_point_sec expiration          = {};
@@ -603,13 +619,13 @@ namespace eosio { namespace ship_protocol {
    using contract_index_long_double = std::variant<contract_index_long_double_v0>;
 
    struct key_value_v0 {
-      eosio::name         database = {};
       eosio::name         contract = {};
       eosio::input_stream key      = {};
       eosio::input_stream value    = {};
+      eosio::name         payer    = {};
    };
 
-   EOSIO_REFLECT(key_value_v0, database, contract, key, value)
+   EOSIO_REFLECT(key_value_v0, contract, key, value, payer)
 
    using key_value = std::variant<key_value_v0>;
 
@@ -670,7 +686,35 @@ namespace eosio { namespace ship_protocol {
                  deferred_trx_expiration_window, max_transaction_delay, max_inline_action_size, max_inline_action_depth,
                  max_authority_depth)
 
-   using chain_config = std::variant<chain_config_v0>;
+   struct chain_config_v1 {
+      uint64_t max_block_net_usage                 = {};
+      uint32_t target_block_net_usage_pct          = {};
+      uint32_t max_transaction_net_usage           = {};
+      uint32_t base_per_transaction_net_usage      = {};
+      uint32_t net_usage_leeway                    = {};
+      uint32_t context_free_discount_net_usage_num = {};
+      uint32_t context_free_discount_net_usage_den = {};
+      uint32_t max_block_cpu_usage                 = {};
+      uint32_t target_block_cpu_usage_pct          = {};
+      uint32_t max_transaction_cpu_usage           = {};
+      uint32_t min_transaction_cpu_usage           = {};
+      uint32_t max_transaction_lifetime            = {};
+      uint32_t deferred_trx_expiration_window      = {};
+      uint32_t max_transaction_delay               = {};
+      uint32_t max_inline_action_size              = {};
+      uint16_t max_inline_action_depth             = {};
+      uint16_t max_authority_depth                 = {};
+      uint32_t max_action_return_value_size        = {};
+   };
+
+   EOSIO_REFLECT(chain_config_v1, max_block_net_usage, target_block_net_usage_pct, max_transaction_net_usage,
+               base_per_transaction_net_usage, net_usage_leeway, context_free_discount_net_usage_num,
+               context_free_discount_net_usage_den, max_block_cpu_usage, target_block_cpu_usage_pct,
+               max_transaction_cpu_usage, min_transaction_cpu_usage, max_transaction_lifetime,
+               deferred_trx_expiration_window, max_transaction_delay, max_inline_action_size, max_inline_action_depth,
+               max_authority_depth, max_action_return_value_size)
+
+   using chain_config = std::variant<chain_config_v0, chain_config_v1>;
 
    struct global_property_v0 {
       std::optional<uint32_t> proposed_schedule_block_num = {};
@@ -688,6 +732,32 @@ namespace eosio { namespace ship_protocol {
    };
 
    EOSIO_REFLECT(global_property_v1, proposed_schedule_block_num, proposed_schedule, configuration, chain_id)
+
+   struct kv_database_config {
+      uint32_t max_key_size   = 0; ///< the maximum size in bytes of a key
+      uint32_t max_value_size = 0; ///< the maximum size in bytes of a value
+      uint32_t max_iterators  = 0; ///< the maximum number of iterators that a contract can have simultaneously.
+   };
+
+   EOSIO_REFLECT(kv_database_config, max_key_size, max_value_size, max_iterators)
+
+   struct wasm_config {
+      uint32_t max_mutable_global_bytes;
+      uint32_t max_table_elements;
+      uint32_t max_section_elements;
+      uint32_t max_linear_memory_init;
+      uint32_t max_func_local_bytes;
+      uint32_t max_nested_structures;
+      uint32_t max_symbol_bytes;
+      uint32_t max_module_bytes;
+      uint32_t max_code_bytes;
+      uint32_t max_pages;
+      uint32_t max_call_depth;
+   };
+
+   EOSIO_REFLECT(wasm_config, max_mutable_global_bytes, max_table_elements, max_section_elements,
+                 max_linear_memory_init, max_func_local_bytes, max_nested_structures, max_symbol_bytes,
+                 max_module_bytes, max_code_bytes, max_pages, max_call_depth)
 
    using global_property = std::variant<global_property_v0, global_property_v1>;
 
@@ -848,3 +918,54 @@ namespace eosio { namespace ship_protocol {
    using resource_limits_config = std::variant<resource_limits_config_v0>;
 
 }} // namespace eosio::ship_protocol
+
+namespace eosio {
+
+   template <typename S>
+   void to_json(const ship_protocol::transaction_status& status, S& stream) {
+      // todo: switch to new serializer string support.
+      return eosio::to_json((uint8_t)status, stream);
+   }
+
+   template <typename S>
+   void from_json(ship_protocol::transaction_status& status, S& stream) {
+      uint8_t v;
+      eosio::from_json(v, stream);
+      status = (ship_protocol::transaction_status)v;
+   }
+
+   template <typename S>
+   void to_bin(const ship_protocol::recurse_transaction_trace& obj, S& stream) {
+      return to_bin(obj.recurse, stream);
+   }
+
+   template <typename S>
+   void from_bin(ship_protocol::recurse_transaction_trace& obj, S& stream) {
+      return from_bin(obj.recurse, stream);
+   }
+
+   template <typename S>
+   void to_json(const ship_protocol::recurse_transaction_trace& obj, S& stream) {
+      return to_json(obj.recurse, stream);
+   }
+
+   template <typename S>
+   void to_json(const std::vector<ship_protocol::recurse_transaction_trace>& obj, S& stream) {
+      if (!obj.empty()) {
+         to_json(obj[0], stream);
+      } else {
+         stream.write("null", 4);
+      }
+   }
+
+   template <typename S>
+   void from_json(std::vector<ship_protocol::recurse_transaction_trace>& result, S& stream) {
+      if(stream.get_null_pred()) {
+         result.clear();
+      } else {
+         result.emplace_back();
+         from_json(result[0], stream);
+      }
+   }
+
+}
