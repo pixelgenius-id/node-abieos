@@ -16,7 +16,7 @@ option(ABIEOS_NO_INT128 "disable use of __int128" OFF)
 find_package(Threads)
 
 add_library(abieos STATIC src/abi.cpp src/crypto.cpp include/eosio/fpconv.c)
-target_include_directories(abieos PUBLIC include external/rapidjson/include)
+target_include_directories(abieos PUBLIC include)
 
 if(ABIEOS_NO_INT128)
 target_compile_definitions(abieos PUBLIC ABIEOS_NO_INT128)
