@@ -1,12 +1,12 @@
 {
   "name": "@eosrio/node-abieos",
-  "version": "1.0.6-1",
+  "version": "2.1.1",
   "description": "Node Bindings for abieos: Binary <> JSON conversion using ABIs.",
   "main": "abieos.js",
   "typings": "abieos.d.ts",
   "scripts": {
     "install": "node -e 'process.exit(0)'",
-    "build": "node-gyp rebuild && cp build/Release/abieos.node dist/abieos.node"
+    "build": "cmake-js compile --cc /usr/bin/clang --cxx /usr/bin/clang++ && cp build/Release/node_abieos.node dist/abieos.node"
   },
   "repository": {
     "type": "git",
@@ -18,10 +18,14 @@
     "url": "https://github.com/eosrio/node-abieos/issues"
   },
   "homepage": "https://github.com/eosrio/node-abieos#readme",
-  "dependencies": {
-    "node-addon-api": "2.0.0"
-  },
   "devDependencies": {
-    "@types/node": "13.9.1"
+    "node-addon-api": "^3.2.1",
+    "cmake-js": "^6.1.0",
+    "@types/node": "^15.12.2"
+  },
+  "cmake-js": {
+    "runtime": "node",
+    "runtimeVersion": "16.0.0",
+    "arch": "x64"
   }
 }

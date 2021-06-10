@@ -4,7 +4,6 @@ Node.js native binding for [abieos](https://github.com/EOSIO/abieos), with some 
 
 - Contracts can be directly updated on the map
 - Added `abieos_delete_contract`
-- Avoid throwing error on _extra data_ (should be handled by the application)
 
 Made with ♥ by [EOS Rio](https://eosrio.io/)
 

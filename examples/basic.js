@@ -1,5 +1,5 @@
-const nodeAbieos = require('@eosrio/node-abieos');
-const eosio_abi = require('@eosrio/node-abieos/eosio.json');
+const nodeAbieos = require('../abieos');
+const eosio_abi = require('../eosio.json');
 
 // abort if not on linux
 if (!nodeAbieos) {
