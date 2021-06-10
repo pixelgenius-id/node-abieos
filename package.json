@@ -19,13 +19,13 @@
   },
   "homepage": "https://github.com/eosrio/node-abieos#readme",
   "devDependencies": {
-    "node-addon-api": "2.0.0",
+    "node-addon-api": "^3.2.1",
     "cmake-js": "^6.1.0",
-    "@types/node": "13.13.1"
+    "@types/node": "^15.12.2"
   },
   "cmake-js": {
     "runtime": "node",
-    "runtimeVersion": "13.0.0",
+    "runtimeVersion": "16.0.0",
     "arch": "x64"
   }
 }
