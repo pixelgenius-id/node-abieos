@@ -39,5 +39,8 @@ env setup instructions soon
 ```shell script
 git clone https://github.com/eosrio/node-abieos.git
 cd node-abieos
-npm run build
+# linux
+npm run build:linux
+# windows
+npm run build:win
 ```

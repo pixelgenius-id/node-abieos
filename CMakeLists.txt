@@ -1,5 +1,5 @@
-cmake_minimum_required (VERSION 3.11)
-project(node_abieos VERSION 2.1 LANGUAGES CXX C)
+cmake_minimum_required (VERSION 3.24)
+project(node_abieos VERSION 2.2 LANGUAGES CXX C)
 
 add_definitions(-DNAPI_VERSION=6)
 add_definitions(-DNAPI_EXPERIMENTAL)
@@ -27,7 +27,7 @@ set_target_properties(abieos PROPERTIES POSITION_INDEPENDENT_CODE ON)
 add_library(${PROJECT_NAME} SHARED src/main.cpp src/abieos.cpp)
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
 target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB};abieos;${CMAKE_THREAD_LIBS_INIT})
-target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wno-unused-parameter -fcolor-diagnostics)
+target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wno-unused-parameter)
 
 execute_process(COMMAND node -p "require('node-addon-api').include" WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} OUTPUT_VARIABLE NODE_ADDON_API_DIR)
 string(REPLACE "\n" "" NODE_ADDON_API_DIR ${NODE_ADDON_API_DIR})
