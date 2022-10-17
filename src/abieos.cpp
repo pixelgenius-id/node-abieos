@@ -5,8 +5,6 @@
 
 #include <memory>
 
-inline const bool catch_all = true;
-
 using namespace abieos;
 
 struct abieos_context_s {
@@ -36,13 +34,9 @@ auto handle_exceptions(abieos_context* context, T errval, F f) noexcept -> declt
     try {
         return f();
     } catch (std::exception& e) {
-        if (!catch_all)
-            throw;
         set_error(context, e.what());
         return errval;
     } catch (...) {
-        if (!catch_all)
-            throw;
         set_error(context, "unknown exception");
         return errval;
     }
@@ -52,12 +46,11 @@ extern "C" abieos_context* abieos_create() {
     try {
         return new abieos_context{};
     } catch (...) {
-        if (!catch_all)
-            throw;
         return nullptr;
     }
 }
 
+// node-abieos
 extern "C" abieos_bool abieos_delete_contract(abieos_context* context, uint64_t contract) {
     auto itr = context->contracts.find(::abieos::name{contract});
     if(itr == context->contracts.end()) {
@@ -186,21 +179,6 @@ extern "C" const char* abieos_get_type_for_table(abieos_context* context, uint64
         auto table_it = c.table_types.find(name{table});
         if (table_it == c.table_types.end())
             throw std::runtime_error("contract \"" + eosio::name_to_string(contract) + "\" does not have table \"" +
-                                     eosio::name_to_string(table) + "\"");
-        return table_it->second.c_str();
-    });
-}
-
-extern "C" const char* abieos_get_kv_table_def(abieos_context* context, uint64_t contract, uint64_t table) {
-    return handle_exceptions(context, nullptr, [&] {
-        auto contract_it = context->contracts.find(::abieos::name{contract});
-        if (contract_it == context->contracts.end())
-            throw std::runtime_error("contract \"" + eosio::name_to_string(contract) + "\" is not loaded");
-        auto& c = contract_it->second;
-
-        auto table_it = c.kv_tables.find(name{table});
-        if (table_it == c.kv_tables.end())
-            throw std::runtime_error("contract \"" + eosio::name_to_string(contract) + "\" does not have kv table \"" +
                                      eosio::name_to_string(table) + "\"");
         return table_it->second.c_str();
     });

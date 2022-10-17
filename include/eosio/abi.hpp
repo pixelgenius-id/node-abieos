@@ -205,14 +205,15 @@ struct abi_type {
    struct array {
       abi_type* type;
    };
+   struct szarray {
+         abi_type* type;
+   };
    struct struct_ {
       abi_type*              base = nullptr;
       std::vector<abi_field> fields;
    };
    using variant = std::vector<abi_field>;
-   std::variant<builtin, const alias_def*, const struct_def*, const variant_def*, alias, optional, extension, array,
-                struct_, variant>
-                         _data;
+   std::variant<builtin, const alias_def*, const struct_def*, const variant_def*, alias, optional, extension, array, szarray, struct_, variant> _data;
    const abi_serializer* ser = nullptr;
 
    template <typename T>
@@ -239,6 +240,12 @@ struct abi_type {
          return t->type;
       else
          return nullptr;
+   }
+   const abi_type* szarray_of() const {
+     if (auto* t = std::get_if<szarray>(&_data))
+        return t->type;
+     else
+        return nullptr;
    }
    const struct_* as_struct() const { return std::get_if<struct_>(&_data); }
    const variant* as_variant() const { return std::get_if<variant>(&_data); }
@@ -273,6 +280,7 @@ void convert(const abi& def, abi_def&);
 extern const abi_serializer* const object_abi_serializer;
 extern const abi_serializer* const variant_abi_serializer;
 extern const abi_serializer* const array_abi_serializer;
+extern const abi_serializer* const szarray_abi_serializer;
 extern const abi_serializer* const extension_abi_serializer;
 extern const abi_serializer* const optional_abi_serializer;
 
@@ -387,7 +395,6 @@ void to_json(const abi_def& def, S& stream) {
    to_json_write_helper(def.error_messages, "error_messages", true, stream);
    to_json_write_helper(def.variants.value, "variants", true, stream);
    to_json_write_helper(def.action_results.value, "action_results", true, stream);
-   to_json_write_helper(def.kv_tables.value, "kv_tables", true, stream);
    stream.write('}');
 }
 } // namespace eosio

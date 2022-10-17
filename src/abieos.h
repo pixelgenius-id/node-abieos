@@ -18,9 +18,6 @@ abieos_context* abieos_create();
 // Destroy a context.
 void abieos_destroy(abieos_context* context);
 
-// Delete a contract from context
-abieos_bool abieos_delete_contract(abieos_context* context, uint64_t contract);
-
 // Get last error. Never returns null. The context owns the returned string.
 const char* abieos_get_error(abieos_context* context);
 
@@ -55,10 +52,6 @@ const char* abieos_get_type_for_action(abieos_context* context, uint64_t contrac
 // to retrieve error.
 const char* abieos_get_type_for_table(abieos_context* context, uint64_t contract, uint64_t table);
 
-// Get the definition for a kv table in json. The context owns the returned memory. Returns null on error; use
-// abieos_get_error to retrieve error.
-const char* abieos_get_kv_table_def(abieos_context* context, uint64_t contract, uint64_t table);
-
 // Get the type name for an action_result. The context owns the returned memory. Returns null on error; use
 // abieos_get_error to retrieve error.
 const char* abieos_get_type_for_action_result(abieos_context* context, uint64_t contract, uint64_t action_result);
@@ -85,6 +78,9 @@ abieos_bool abieos_abi_json_to_bin(abieos_context* context, const char* json);
 // Convert abi bin to json, The context.result_str has the result, Returns null on error; use abieos_get_error to
 // retrieve
 const char* abieos_abi_bin_to_json(abieos_context* context, const char* abi_bin_data, const size_t abi_bin_data_size);
+
+// Delete a contract from context
+abieos_bool abieos_delete_contract(abieos_context* context, uint64_t contract);
 
 #ifdef __cplusplus
 }

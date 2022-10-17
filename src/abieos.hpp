@@ -61,6 +61,7 @@ struct pseudo_optional;
 struct pseudo_extension;
 struct pseudo_object;
 struct pseudo_array;
+struct pseudo_szarray;
 struct pseudo_variant;
 
 // !!!
@@ -321,6 +322,8 @@ void json_to_bin(pseudo_object*, jvalue_to_bin_state& state, bool allow_extensio
                                 const abi_type* type, bool start);
 void json_to_bin(pseudo_array*, jvalue_to_bin_state& state, bool allow_extensions,
                                 const abi_type* type, bool start);
+void json_to_bin(pseudo_szarray*, jvalue_to_bin_state& state, bool allow_extensions,
+                                const abi_type* type, bool start);
 void json_to_bin(pseudo_variant*, jvalue_to_bin_state& state, bool allow_extensions,
                                 const abi_type* type, bool start);
 
@@ -328,6 +331,10 @@ void json_to_bin(pseudo_object*, json_to_bin_state& state, bool allow_extensions
                                 bool start);
 void json_to_bin(pseudo_array*, json_to_bin_state& state, bool allow_extensions, const abi_type* type,
                                 bool start);
+
+void json_to_bin(pseudo_szarray*, json_to_bin_state& state, bool allow_extensions, const abi_type* type,
+                                 bool start);
+
 void json_to_bin(pseudo_variant*, json_to_bin_state& state, bool allow_extensions,
                                 const abi_type* type, bool start);
 
@@ -337,8 +344,13 @@ void bin_to_json(pseudo_extension*, bin_to_json_state& state, bool allow_extensi
                                 const abi_type* type, bool start);
 void bin_to_json(pseudo_object*, bin_to_json_state& state, bool allow_extensions, const abi_type* type,
                                 bool start);
-void bin_to_json(pseudo_array*, bin_to_json_state& state, bool allow_extensions, const abi_type* type,
+
+void bin_to_json(pseudo_szarray*, bin_to_json_state& state, bool allow_extensions, const abi_type* type,
                                 bool start);
+
+void json_to_bin(pseudo_szarray*, json_to_bin_state& state, bool allow_extensions, const abi_type* type,
+                                 bool start);
+
 void bin_to_json(pseudo_variant*, bin_to_json_state& state, bool allow_extensions,
                                 const abi_type* type, bool start);
 
@@ -681,6 +693,8 @@ inline void json_to_bin(pseudo_array*, jvalue_to_bin_state& state, bool, const a
     return t->ser->json_to_bin(state, false, t, true);
 }
 
+inline void json_to_bin(pseudo_szarray*, jvalue_to_bin_state& state, bool, const abi_type* type, bool start) {}
+
 inline void json_to_bin(pseudo_variant*, jvalue_to_bin_state& state, bool allow_extensions,
                                        const abi_type* type, bool start) {
     if (start) {
@@ -840,6 +854,8 @@ inline void json_to_bin(pseudo_array*, json_to_bin_state& state, bool, const abi
     t->ser->json_to_bin(state, false, t, true);
 }
 
+inline void json_to_bin(pseudo_szarray*, json_to_bin_state& state, bool, const abi_type* type, bool start) {}
+
 inline void json_to_bin(pseudo_variant*, json_to_bin_state& state, bool allow_extensions,
                                        const abi_type* type, bool start) {
     if (start) {
@@ -972,6 +988,8 @@ inline void bin_to_json(pseudo_array*, bin_to_json_state& state, bool, const abi
         return state.writer.write(']');
     }
 }
+
+inline void bin_to_json(pseudo_szarray*, bin_to_json_state& state, bool, const abi_type* type, bool start) {}
 
 inline void bin_to_json(pseudo_variant*, bin_to_json_state& state, bool allow_extensions,
                                          const abi_type* type, bool start) {

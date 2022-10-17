@@ -1,6 +1,6 @@
 {
   "name": "@eosrio/node-abieos",
-  "version": "2.2.0",
+  "version": "3.1.0",
   "description": "Node Bindings for abieos: Binary <> JSON conversion using ABIs.",
   "main": "./lib/abieos.js",
   "typings": "./lib/abieos.d.ts",

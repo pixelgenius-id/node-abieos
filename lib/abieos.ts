@@ -41,7 +41,6 @@ export class Abieos {
     }
 
     public hexToJson(contractName: string, type: string, hex: string): string {
-        console.log(hex);
         const data = Abieos.native.hex_to_json(contractName, type, hex);
         if (data) {
             try {

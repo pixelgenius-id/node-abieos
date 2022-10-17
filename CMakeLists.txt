@@ -1,8 +1,8 @@
 cmake_minimum_required (VERSION 3.24)
 project(node_abieos VERSION 2.2 LANGUAGES CXX C)
 
-add_definitions(-DNAPI_VERSION=6)
-add_definitions(-DNAPI_EXPERIMENTAL)
+add_definitions(-DNAPI_VERSION=8)
+# add_definitions(-DNAPI_EXPERIMENTAL)
 
 include_directories(${CMAKE_JS_INC})
 
