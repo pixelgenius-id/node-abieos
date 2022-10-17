@@ -1,5 +1,4 @@
 import {createRequire} from 'module';
-import {type} from "os";
 
 const require = createRequire(import.meta.url);
 
@@ -8,7 +7,7 @@ let abieos: any | null = null;
 if (process.platform === 'linux') {
     abieos = require(modulePath);
 } else if (process.platform === 'win32') {
-    throw new Error(`${process.platform} is not supported by node-abieos`);
+    // throw new Error(`${process.platform} is not supported by node-abieos`);
     abieos = null;
 }
 
@@ -42,6 +41,7 @@ export class Abieos {
     }
 
     public hexToJson(contractName: string, type: string, hex: string): string {
+        console.log(hex);
         const data = Abieos.native.hex_to_json(contractName, type, hex);
         if (data) {
             try {
