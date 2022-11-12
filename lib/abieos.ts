@@ -40,7 +40,7 @@ export class Abieos {
         }
     }
 
-    public hexToJson(contractName: string, type: string, hex: string): string {
+    public hexToJson(contractName: string, type: string, hex: string): any {
         const data = Abieos.native.hex_to_json(contractName, type, hex);
         if (data) {
             try {
@@ -53,7 +53,7 @@ export class Abieos {
         }
     }
 
-    public binToJson(contractName: string, type: string, buffer: Buffer): string {
+    public binToJson(contractName: string, type: string, buffer: Buffer): any {
         const data = Abieos.native.bin_to_json(contractName, type, buffer);
         if (data[0] === '{' || data[0] === '[') {
             try {
