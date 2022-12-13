@@ -83,15 +83,7 @@ if (status) {
 
 // check whether the contract was deleted
 try {
-    const result = abieos.getTypeForAction("eosio", "voteproducer");
-    console.log(result);
+    abieos.getTypeForAction("eosio", "voteproducer");
 } catch (e) {
-    console.log(e.message);
+    console.log('OK - Contract context removal confirmed');
 }
-
-const test = abieos.hexToJson(
-    'eosio.token',
-    'transfer',
-    '000000008086d55d0000000000c0a68380f0fa020000000004585052000000002477656c636f6d6520746f2074686520667574757265206f662062616e6b696e672e20f09f90ba'
-);
-console.log(test);
