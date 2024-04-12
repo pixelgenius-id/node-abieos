@@ -1,11 +1,12 @@
 #include <napi.h>
 #include <napi-inl.h>
 
-#include "abieos.h"
-#include "abieos.hpp"
 #include <cstdio>
 #include <string>
 #include <iostream>
+
+#include "../abieos/src/abieos.h"
+#include "../abieos/src/abieos.hpp"
 
 using namespace std;
 

@@ -8,7 +8,10 @@
     "install": "node -e 'process.exit(0)'",
     "test": "cd examples && node basic.js",
     "tsc:watch": "tsc --watch",
-    "build:linux": "cmake-js compile --cc /usr/bin/clang --cxx /usr/bin/clang++ && cp build/Release/node_abieos.node dist/abieos.node",
+    "clean": "cmake-js clean",
+    "build:tsc": "tsc",
+    "build:linux": "cmake-js compile --cc /usr/bin/clang-18 --cxx /usr/bin/clang++-18 && cp build/Release/node_abieos.node dist/abieos.node",
+    "build:linux:ci": "cmake-js compile && cp build/Release/node_abieos.node dist/abieos.node",
     "build:win": "cmake-js"
   },
   "type": "module",
@@ -23,14 +26,17 @@
   },
   "homepage": "https://github.com/eosrio/node-abieos#readme",
   "devDependencies": {
-    "node-addon-api": "^5.0.0",
-    "cmake-js": "^7.0.0",
-    "@types/node": "^18.11.13",
-    "typescript": "^4.9.4"
+    "@types/node": "20.12.7",
+    "cmake-js": "7.3.0",
+    "node-addon-api": "8.0.0",
+    "typescript": "5.4.5"
+  },
+  "binary": {
+    "napi_versions": [9]
   },
   "cmake-js": {
     "runtime": "node",
-    "runtimeVersion": "18.0.0",
+    "runtimeVersion": "20.0.0",
     "arch": "x64"
   }
 }

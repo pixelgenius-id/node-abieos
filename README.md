@@ -1,5 +1,8 @@
 # node-abieos
 
+![Node-API v9 Badge](https://github.com/nodejs/abi-stable-node/blob/doc/assets/Node-API%20v9%20Badge.svg)
+[![NPM version](https://img.shields.io/npm/v/@eosrio/node-abieos.svg?style=flat)](https://www.npmjs.com/package/@eosrio/node-abieos)
+
 Node.js native binding for [abieos](https://github.com/EOSIO/abieos), with some improvements:
 
 - Contracts can be directly updated on the map
