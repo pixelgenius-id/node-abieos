@@ -1,0 +1,3 @@
+[submodule "abieos"]
+	path = native-abieos
+	url = https://github.com/igorls/abieos.git
