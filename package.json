@@ -9,7 +9,9 @@
     "test": "cd examples && node basic.js",
     "tsc:watch": "tsc --watch",
     "clean": "cmake-js clean",
+    "build:tsc": "tsc",
     "build:linux": "cmake-js compile --cc /usr/bin/clang-18 --cxx /usr/bin/clang++-18 && cp build/Release/node_abieos.node dist/abieos.node",
+    "build:linux:ci": "cmake-js compile && cp build/Release/node_abieos.node dist/abieos.node",
     "build:win": "cmake-js"
   },
   "type": "module",
