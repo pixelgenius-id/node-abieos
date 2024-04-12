@@ -29,8 +29,8 @@ endif()
 find_package(Threads)
 include(GNUInstallDirs)
 
-add_library(abieos STATIC native-abieos/src/abi.cpp native-abieos/src/crypto.cpp native-abieos/include/eosio/fpconv.c)
-target_include_directories(abieos PUBLIC native-abieos/include native-abieos/external/rapidjson/include)
+add_library(abieos STATIC abieos/src/abi.cpp abieos/src/crypto.cpp abieos/include/eosio/fpconv.c)
+target_include_directories(abieos PUBLIC abieos/include abieos/external/rapidjson/include)
 
 if(ABIEOS_NO_INT128)
 target_compile_definitions(abieos PUBLIC ABIEOS_NO_INT128)
@@ -38,7 +38,7 @@ endif()
 
 set_target_properties(abieos PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
-add_library(${PROJECT_NAME} SHARED src/main.cpp native-abieos/src/abieos.cpp)
+add_library(${PROJECT_NAME} SHARED src/main.cpp abieos/src/abieos.cpp)
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
 target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB};abieos;${CMAKE_THREAD_LIBS_INIT})
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wno-unused-parameter)
