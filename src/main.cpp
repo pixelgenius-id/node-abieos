@@ -5,8 +5,8 @@
 #include <string>
 #include <iostream>
 
-#include "../native-abieos/src/abieos.h"
-#include "../native-abieos/src/abieos.hpp"
+#include "../abieos/src/abieos.h"
+#include "../abieos/src/abieos.hpp"
 
 using namespace std;
 
