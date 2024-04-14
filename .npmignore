@@ -7,3 +7,4 @@ tools
 CMakeLists.txt
 tsconfig.json
 *.tgz
+abieos

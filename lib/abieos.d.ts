@@ -1,5 +1,5 @@
 /// <reference types="node" />
-declare let abieos: any | null;
+declare const abieos: any;
 export declare class Abieos {
     private static instance;
     static native: typeof abieos;

@@ -1,6 +1,6 @@
 import {Abieos} from "../lib/abieos.js";
 import {readFileSync} from "node:fs";
-import {typeTests} from "./tests.js";
+import {typeTests} from "./tests.mjs";
 
 const ABIs = [
     {code: 'eosio', path: './ABIs/eosio.json'},
