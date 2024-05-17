@@ -114,8 +114,10 @@ bool load_abi(const char *contract_name, const char *abi)
 {
     if(global_context == nullptr) {
         global_context = abieos_create();
+        // std::cout << "[main.cpp] new context created!" << "\n";
     }
     uint64_t contract = abieos_string_to_name(global_context, contract_name);
+    abieos_delete_contract(global_context, contract);
     bool abi_status = abieos_set_abi(global_context, contract, abi);
     if(!abi_status) {
         std::cout << "load_abi error on [" << contract_name << "] - " << abieos_get_error(global_context) << "\n";
@@ -138,8 +140,10 @@ bool load_abi_hex(const char *contract_name, const char *hex)
 {
     if(global_context == nullptr) {
         global_context = abieos_create();
+        // std::cout << "[main.cpp] new context created!" << "\n";
     }
     uint64_t contract = abieos_string_to_name(global_context, contract_name);
+    abieos_delete_contract(global_context, contract);
     bool abi_status = abieos_set_abi_hex(global_context, contract, hex);
     if(!abi_status)
     {
@@ -154,8 +158,8 @@ Napi::Boolean LoadAbiHexWrapped(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
     std::string contract_name = info[0].As<Napi::String>().Utf8Value();
-    std::string abihex = info[1].As<Napi::String>().Utf8Value();
-    auto returnValue = load_abi_hex(&contract_name[0u], &abihex[0u]);
+    std::string abi_hex = info[1].As<Napi::String>().Utf8Value();
+    auto returnValue = load_abi_hex(&contract_name[0u], &abi_hex[0u]);
     return Napi::Boolean::New(env, returnValue);
 }
 
@@ -211,11 +215,11 @@ Napi::String GetTableTypeWrapped(const Napi::CallbackInfo &info)
 
 bool delete_contract(const char *contract_name) {
     if(global_context != nullptr) {
-            uint64_t contract = abieos_string_to_name(global_context, contract_name);
-            return abieos_delete_contract(global_context, contract);
-        } else {
-            return false;
-        }
+        uint64_t contract = abieos_string_to_name(global_context, contract_name);
+        return abieos_delete_contract(global_context, contract);
+    } else {
+        return false;
+    }
 }
 
 Napi::Boolean DeleteContractWrapped(const Napi::CallbackInfo &info)
