@@ -8,3 +8,6 @@ CMakeLists.txt
 tsconfig.json
 *.tgz
 abieos
+.vscode
+.github
+bun.lockb
