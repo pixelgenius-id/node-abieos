@@ -1,11 +1,17 @@
 const abieos = require("./abieos.node");
+const {randomUUID} = require("node:crypto");
 
 export class Abieos {
     private static instance: Abieos;
     public static native: typeof abieos;
+    private static instanceId: any;
 
     private constructor() {
+        if (Abieos.instance) {
+            throw new Error("This class is a Singleton!");
+        }
         Abieos.native = abieos;
+        Abieos.instanceId = randomUUID();
     }
 
     public static getInstance(): Abieos {
@@ -74,7 +80,7 @@ export class Abieos {
     public getTypeForAction(contractName: string, actionName: string): string {
         const result = Abieos.native.get_type_for_action(contractName, actionName);
         if (result === 'NOT_FOUND') {
-            throw new Error('action ' + actionName + ' not found on contract ' + contractName);
+            throw new Error(`[${Abieos.instanceId}] action ` + actionName + ' not found on contract ' + contractName);
         } else {
             return result;
         }
@@ -83,7 +89,7 @@ export class Abieos {
     public getTypeForTable(contractName: string, table_name: string): string {
         const result = Abieos.native.get_type_for_table(contractName, table_name);
         if (result === 'NOT_FOUND') {
-            throw new Error('table ' + table_name + ' not found on contract ' + contractName);
+            throw new Error(`[${Abieos.instanceId}] table ` + table_name + ' not found on contract ' + contractName);
         } else {
             return result;
         }

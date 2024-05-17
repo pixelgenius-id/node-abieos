@@ -3,6 +3,7 @@ declare const abieos: any;
 export declare class Abieos {
     private static instance;
     static native: typeof abieos;
+    private static instanceId;
     private constructor();
     static getInstance(): Abieos;
     stringToName(nameString: string): BigInteger;
