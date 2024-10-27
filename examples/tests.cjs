@@ -1,4 +1,4 @@
-export function typeTests(abieos) {
+function typeTests(abieos) {
 
     const typeTests = [
         {type: 'action', code: 'eosio', name: 'voteproducer', expects: 'voteproducer'},
@@ -26,3 +26,5 @@ export function typeTests(abieos) {
         }
     });
 }
+
+module.exports = {typeTests};

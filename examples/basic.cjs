@@ -1,6 +1,6 @@
-import {Abieos} from "@eosrio/node-abieos";
-import {readFileSync} from "node:fs";
-import {typeTests} from "./tests.mjs";
+const {Abieos} = require('@eosrio/node-abieos');
+const {readFileSync} = require('node:fs');
+const {typeTests} = require('./tests.cjs');
 
 const ABIs = [
     {code: 'eosio', path: './ABIs/eosio.json'},
@@ -9,6 +9,8 @@ const ABIs = [
 ];
 
 const abieos = Abieos.getInstance();
+
+console.log(abieos);
 
 ABIs.forEach(value => {
     const data = readFileSync(value.path).toString();

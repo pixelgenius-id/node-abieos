@@ -1,9 +1,8 @@
 /// <reference types="node" />
-declare const abieos: any;
+
 export declare class Abieos {
     private static instance;
     static native: typeof abieos;
-    private static instanceId;
     private constructor();
     static getInstance(): Abieos;
     stringToName(nameString: string): BigInteger;
@@ -16,5 +15,7 @@ export declare class Abieos {
     getTypeForTable(contractName: string, table_name: string): string;
     deleteContract(contractName: string): boolean;
 }
-export {};
-//# sourceMappingURL=abieos.d.ts.map
+
+declare const abieos: any;
+
+export { }

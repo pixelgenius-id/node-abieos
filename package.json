@@ -1,13 +1,15 @@
 {
   "name": "@eosrio/node-abieos",
-  "version": "3.3.2",
+  "version": "3.3.3-23007ce",
   "description": "Node Bindings for abieos: Binary <> JSON conversion using ABIs.",
-  "main": "./lib/abieos.js",
-  "types": "./lib/abieos.d.ts",
+  "main": "./dist/abieos.js",
+  "types": "./dist/abieos.d.ts",
+  "type": "module",
   "exports": {
     ".": {
-      "require": "./lib/abieos.js",
-      "types": "./lib/abieos.d.ts"
+      "types": "./dist/abieos.d.ts",
+      "import": "./dist/abieos.js",
+      "require": "./dist/abieos.cjs"
     }
   },
   "scripts": {
@@ -16,7 +18,8 @@
     "tsc:watch": "tsc --watch",
     "clean": "cmake-js clean",
     "bundle": "tsup lib/abieos.ts --format cjs,esm --dts --clean",
-    "build:tsc": "tsc",
+    "bundle:esm": "tsup lib/abieos.ts --format esm --dts --clean",
+    "build": "tsup",
     "build:linux": "cmake-js compile --cc /usr/bin/clang-18 --cxx /usr/bin/clang++-18 && cp build/Release/node_abieos.node lib/abieos.node",
     "build:linux:ci": "cmake-js compile && cp build/Release/node_abieos.node lib/abieos.node",
     "build:win": "cmake-js"
@@ -32,11 +35,12 @@
   },
   "homepage": "https://github.com/eosrio/node-abieos#readme",
   "devDependencies": {
-    "@types/node": "20.12.7",
+    "@microsoft/api-extractor": "7.47.11",
+    "@types/node": "22.8.1",
     "cmake-js": "7.3.0",
-    "node-addon-api": "8.0.0",
-    "tsup": "^8.0.2",
-    "typescript": "5.4.5"
+    "node-addon-api": "8.2.1",
+    "tsup": "^8.3.5",
+    "typescript": "5.4.2"
   },
   "binary": {
     "napi_versions": [
@@ -45,7 +49,7 @@
   },
   "cmake-js": {
     "runtime": "node",
-    "runtimeVersion": "20.0.0",
+    "runtimeVersion": "22.0.0",
     "arch": "x64"
   }
 }
