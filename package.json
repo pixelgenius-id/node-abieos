@@ -17,8 +17,6 @@
     "test": "cd examples && node basic.mjs",
     "tsc:watch": "tsc --watch",
     "clean": "cmake-js clean",
-    "bundle": "tsup lib/abieos.ts --format cjs,esm --dts --clean",
-    "bundle:esm": "tsup lib/abieos.ts --format esm --dts --clean",
     "build": "tsup",
     "build:linux": "cmake-js compile --cc /usr/bin/clang-18 --cxx /usr/bin/clang++-18 && cp build/Release/node_abieos.node lib/abieos.node",
     "build:linux:ci": "cmake-js compile && cp build/Release/node_abieos.node lib/abieos.node",

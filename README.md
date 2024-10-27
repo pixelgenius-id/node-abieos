@@ -54,5 +54,5 @@ git clone https://github.com/eosrio/node-abieos.git
 cd node-abieos
 npm install
 npm run build:linux
-npm run build:tsc
+npm run build
 ```
