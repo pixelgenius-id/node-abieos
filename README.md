@@ -4,7 +4,7 @@
 ![Node-API v9 Badge](https://github.com/nodejs/abi-stable-node/blob/doc/assets/Node-API%20v9%20Badge.svg)
 [![NPM version](https://img.shields.io/npm/v/@eosrio/node-abieos.svg?style=flat)](https://www.npmjs.com/package/@eosrio/node-abieos)
 
-Node.js native binding for [abieos](https://github.com/EOSIO/abieos), with some improvements:
+Node.js native binding for [abieos](https://github.com/AntelopeIO/abieos), with some improvements:
 
 - Contracts can be directly updated on the map
 - Added `abieos_delete_contract`
@@ -32,7 +32,8 @@ const nodeAbieos = require('@eosrio/node-abieos');
 
 ES Modules
 ```typescript
-import * as nodeAbieos from "@eosrio/node-abieos";
+import {Abieos} from "@eosrio/node-abieos";
+const abieos = Abieos.getInstance();
 ```
 
 Check the [/examples](https://github.com/eosrio/node-abieos/tree/master/examples) folder for implementation examples
@@ -50,7 +51,7 @@ sudo ./llvm.sh 18
 
 Clone and Build
 ```shell script
-git clone https://github.com/eosrio/node-abieos.git
+git clone https://github.com/eosrio/node-abieos.git --recursive
 cd node-abieos
 npm install
 npm run build:linux
