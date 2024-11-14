@@ -1,5 +1,3 @@
-/// <reference types="node" />
-
 export declare class Abieos {
     private static instance;
     static native: typeof abieos;
