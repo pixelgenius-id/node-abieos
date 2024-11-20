@@ -45,7 +45,7 @@ const serializedData = Serializer.encode({
 
 const hexData = serializedData.toString('hex');
 
-console.log("HEX Data", hexData);
+console.log("HEX Data (from Wharfkit)\n", hexData);
 
 const deserializedData = Serializer.decode({
     abi,
@@ -58,12 +58,22 @@ console.log("Deserialized Data (Wharfkit)", Serializer.objectify(deserializedDat
 // loading ABI
 const status = abieos.loadAbi('test', abi.toJSON());
 if (status) {
+
+    // deserialize
     const abieosDecoded = abieos.hexToJson('test', 'nested', hexData);
     console.log("Deserialized Data (ABIEOS)", abieosDecoded);
-    const outputString = JSON.stringify(abieosDecoded);
-    if (outputString !== inputString) {
+    if (JSON.stringify(abieosDecoded) !== inputString) {
         console.error(`Input / Output Mismatch`);
     } else {
-        console.log('Test Completed!');
+        console.log('JSON Data Matched!');
+    }
+
+    // serialize again
+    const abieosEncoded = abieos.jsonToHex('test', 'nested', abieosDecoded);
+    console.log("HEX Data (ABIEOS)\n", abieosEncoded);
+    if (hexData !== abieosEncoded) {
+        console.error(`Hex Data Mismatch`);
+    } else {
+        console.log('HEX Data Matched!');
     }
 }
