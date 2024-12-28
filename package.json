@@ -1,6 +1,6 @@
 {
   "name": "@eosrio/node-abieos",
-  "version": "3.3.4-a9d3362",
+  "version": "3.3.4-97af3fd",
   "description": "Node Bindings for abieos: Binary <> JSON conversion using ABIs.",
   "main": "./dist/abieos.js",
   "types": "./dist/abieos.d.ts",
@@ -34,13 +34,13 @@
   },
   "homepage": "https://github.com/eosrio/node-abieos#readme",
   "devDependencies": {
-    "@microsoft/api-extractor": "7.47.11",
+    "@microsoft/api-extractor": "7.48.1",
     "@wharfkit/antelope": "^1.0.13",
-    "@types/node": "22.9.0",
+    "@types/node": "22.10.2",
     "cmake-js": "7.3.0",
-    "node-addon-api": "8.2.2",
+    "node-addon-api": "8.3.0",
     "tsup": "^8.3.5",
-    "typescript": "5.6.3"
+    "typescript": "5.7.2"
   },
   "binary": {
     "napi_versions": [
