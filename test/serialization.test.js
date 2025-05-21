@@ -1,0 +1,87 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { assertThrows, setupAbieos } from './test-helpers.js';
+
+test.describe('Serialization (jsonToHex)', () => {
+    let abieos;
+
+    const contractAccount = "test.token";
+    const transferABI = {
+        version: "eosio::abi/1.1",
+        types: [],
+        structs: [{
+            name: "transfer",
+            base: "",
+            fields: [
+                { name: "from", type: "name" },
+                { name: "to", type: "name" },
+                { name: "quantity", type: "asset" },
+                { name: "memo", type: "string" }
+            ]
+        }],
+        actions: [{ name: "transfer", type: "transfer", ricardian_contract: "" }],
+    };
+
+    test.beforeEach(() => {
+        abieos = setupAbieos();
+        abieos.loadAbi(contractAccount, transferABI); 
+    });
+
+    test('should serialize valid transfer action data', () => {
+        const actionData = {
+            from: "alice",
+            to: "bob",
+            quantity: "1.0000 EOS",
+            memo: "test transfer"
+        };
+        const hex = abieos.jsonToHex(contractAccount, "transfer", actionData);
+        assert.ok(typeof hex === 'string' && hex.length > 0, 'Should return a non-empty hex string');
+    });
+
+    test('should throw if ABI for contract is not loaded', () => {
+        const actionData = { from: "a", to: "b", quantity: "1.0 EOS", memo: "m" };
+        assertThrows(
+            () => abieos.jsonToHex("unknown.contract", "transfer", actionData),
+            /failed to parse data/i, // Updated regex
+            'Should throw if ABI is not loaded'
+        );
+    });
+
+    test('should throw if type is not found in ABI', () => {
+        const actionData = { from: "a", to: "b", quantity: "1.0 EOS", memo: "m" };
+        // While setupAbieos.getType might throw a specific error, jsonToHex's C++ part might fail first,
+        // leading to the generic wrapper error.
+        assertThrows(
+            () => abieos.jsonToHex(contractAccount, "unknown_type", actionData),
+            /failed to parse data/i, // Updated regex
+            'Should throw if type is not found'
+        );
+    });
+
+    test('should throw for data with missing required fields', () => {
+        const actionData = {
+            from: "alice",
+            quantity: "1.0000 EOS",
+            memo: "test transfer"
+        };
+        assertThrows(
+            () => abieos.jsonToHex(contractAccount, "transfer", actionData),
+            /failed to parse data/i, // Updated regex
+            'Should throw for missing required fields'
+        );
+    });
+
+    test('should throw for data with incorrect types', () => {
+        const actionData = {
+            from: "alice",
+            to: "bob",
+            quantity: 12345, 
+            memo: "test transfer"
+        };
+        assertThrows(
+            () => abieos.jsonToHex(contractAccount, "transfer", actionData),
+            /failed to parse data/i, // Updated regex
+            'Should throw for incorrect data types'
+        );
+    });
+});

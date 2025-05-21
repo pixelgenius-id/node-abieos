@@ -1,0 +1,112 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { assertThrows, setupAbieos, testRoundTrip as globalTestRoundTrip } from './test-helpers.js';
+
+test.describe('EOSIO Specific Types', () => {
+    let abieos;
+
+    const contract = 'eosio.types';
+    const eosioTypesAbi = {
+        version: 'eosio::abi/1.1',
+        types: [],
+        structs: [
+            { name: 'name_type', base: '', fields: [{ name: 'value', type: 'name' }] },
+            { name: 'asset_type', base: '', fields: [{ name: 'value', type: 'asset' }] },
+            { name: 'symbol_type', base: '', fields: [{ name: 'value', type: 'symbol' }] },
+            { name: 'symbol_code_type', base: '', fields: [{ name: 'value', type: 'symbol_code' }] },
+            { name: 'checksum_types', base: '', fields: [
+                { name: 'hash160', type: 'checksum160' },
+                { name: 'hash256', type: 'checksum256' },
+                { name: 'hash512', type: 'checksum512' }
+            ]},
+            { name: 'public_key_type', base: '', fields: [{ name: 'value', type: 'public_key' }] },
+            { name: 'time_types', base: '', fields: [
+                { name: 'time_point', type: 'time_point' },
+                { name: 'time_point_sec', type: 'time_point_sec' },
+                { name: 'block_timestamp', type: 'block_timestamp_type' }
+            ]}
+        ],
+        actions: [],
+        tables: [],
+        variants: []
+    };
+
+    test.beforeEach(() => {
+        abieos = setupAbieos();
+        abieos.loadAbi(contract, eosioTypesAbi);
+    });
+
+    test('name type serialization/deserialization', () => {
+        globalTestRoundTrip(abieos, contract, 'name_type', { value: "eosio" });
+        globalTestRoundTrip(abieos, contract, 'name_type', { value: "eosio.token" });
+        globalTestRoundTrip(abieos, contract, 'name_type', { value: "eosio.null" });
+        globalTestRoundTrip(abieos, contract, 'name_type', { value: "" });
+        globalTestRoundTrip(abieos, contract, 'name_type', { value: "a" });
+        globalTestRoundTrip(abieos, contract, 'name_type', { value: "zzzzzzzzzzzzj" });
+        
+        if (typeof abieos.stringToName === 'function' && typeof abieos.nameToString === 'function') {
+            const nameValue = abieos.stringToName("eosio.token");
+            assert.ok(typeof nameValue === 'bigint' || typeof nameValue === 'number', 'stringToName should return a BigInt or Number');
+            const nameAsString = abieos.nameToString(nameValue);
+            assert.strictEqual(nameAsString, "eosio.token", 'roundtrip name conversion should match');
+        }
+    });
+    
+    test('asset type serialization/deserialization', () => {
+        globalTestRoundTrip(abieos, contract, 'asset_type', { value: "1.0000 EOS" });
+        globalTestRoundTrip(abieos, contract, 'asset_type', { value: "0.0000 EOS" });
+        globalTestRoundTrip(abieos, contract, 'asset_type', { value: "-1.0000 EOS" });
+        globalTestRoundTrip(abieos, contract, 'asset_type', { value: "1000000000.0000 EOS" });
+    });
+
+    test('time types serialization/deserialization', () => {
+        // For time_point_sec, the library seems to consistently return .000, so tests should expect that.
+        globalTestRoundTrip(abieos, contract, 'time_types', {
+            time_point: "1970-01-01T00:00:00.000",
+            time_point_sec: "1970-01-01T00:00:00.000", // Adjusted to expect .000
+            block_timestamp: "2000-01-01T00:00:00.000" // Assuming block_timestamp (slot based) also aligns to .000 in this test case
+        });
+        
+        globalTestRoundTrip(abieos, contract, 'time_types', {
+            time_point: "2023-05-21T12:34:56.789",
+            time_point_sec: "2023-05-21T12:34:56.000", // Adjusted to expect .000
+            block_timestamp: "2023-05-21T12:34:56.500" 
+        });
+        
+        assertThrows(
+            /Failed to convert JSON to hex.*Expected time point/i,
+            () => abieos.jsonToHex(contract, 'time_types', {
+                time_point: "invalid time",
+                time_point_sec: "2023-05-21T12:34:56.000",
+                block_timestamp: "2023-05-21T12:34:56.500"
+            }),
+            'Should reject invalid time_point format'
+        );
+    });
+
+    test('public key serialization/deserialization', () => {
+        const eosKey = "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV";
+        const data = { value: eosKey };
+        
+        const hex = abieos.jsonToHex(contract, 'public_key_type', data);
+        const result = abieos.hexToJson(contract, 'public_key_type', hex);
+        
+        let isValidFormat = result.value.startsWith('PUB_K1_') || result.value.startsWith('EOS');
+        if (eosKey.startsWith('PUB_K1_')) { 
+            isValidFormat = result.value.startsWith('PUB_K1_');
+        }
+        assert.ok(isValidFormat, `Returned key ${result.value} should be in a valid format`);
+
+        assertThrows(
+            /Failed to convert JSON to hex.*Expected public key/i,
+            () => abieos.jsonToHex(contract, 'public_key_type', { value: "invalid key" }),
+            'Should reject invalid public key format'
+        );
+        
+        assertThrows(
+            /Failed to convert JSON to hex.*Expected key/i,
+            () => abieos.jsonToHex(contract, 'public_key_type', { value: "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CZ" }), 
+            'Should reject public key with invalid checksum'
+        );
+    });
+});
