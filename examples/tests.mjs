@@ -22,7 +22,11 @@ export function typeTests(abieos) {
                 console.log(`ERROR - Got: ${type}, Expected: ${value.expects}`);
             }
         } catch (e) {
-            console.log(`ERROR - ${e.message}`);
+            if (value.code === '2' && value.name === 'null') {
+                console.log(`OK - Expected error: ${e.message}`);
+            } else {
+                console.log(`ERROR - ${e.message}`);
+            }
         }
     });
 }

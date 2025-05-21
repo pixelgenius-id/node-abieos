@@ -1,6 +1,6 @@
 {
   "name": "@eosrio/node-abieos",
-  "version": "3.3.4-97af3fd",
+  "version": "4.0.0-2039717",
   "description": "Node Bindings for abieos: Binary <> JSON conversion using ABIs.",
   "main": "./dist/abieos.js",
   "types": "./dist/abieos.d.ts",
@@ -14,7 +14,10 @@
   },
   "scripts": {
     "install": "node -e 'process.exit(0)'",
-    "test": "cd examples && node basic.mjs",
+    "test": "node --test test/**/*.test.js",
+    "test:examples": "cd examples && node basic.mjs",
+    "test:coverage": "node --test --experimental-test-coverage test/**/*.test.js",
+    "test:watch": "node --test --watch test/**/*.test.js",
     "tsc:watch": "tsc --watch",
     "clean": "cmake-js clean",
     "build": "tsup",
@@ -34,22 +37,17 @@
   },
   "homepage": "https://github.com/eosrio/node-abieos#readme",
   "devDependencies": {
-    "@microsoft/api-extractor": "7.48.1",
+    "@microsoft/api-extractor": "7.52.8",
     "@wharfkit/antelope": "^1.0.13",
-    "@types/node": "22.10.2",
-    "cmake-js": "7.3.0",
-    "node-addon-api": "8.3.0",
-    "tsup": "^8.3.5",
-    "typescript": "5.7.2"
+    "@types/node": "^22.15.21",
+    "cmake-js": "7.3.1",
+    "node-addon-api": "8.3.1",
+    "tsup": "^8.5.0",
+    "typescript": "5.8.3"
   },
   "binary": {
     "napi_versions": [
-      9
+      10
     ]
-  },
-  "cmake-js": {
-    "runtime": "node",
-    "runtimeVersion": "22.0.0",
-    "arch": "x64"
   }
 }
