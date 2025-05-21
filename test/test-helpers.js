@@ -18,7 +18,6 @@ export function assertThrows(expectedError, fn, message) {
         } else if (typeof expectedError === 'string') {
             assert.strictEqual(e.message, expectedError, message);
         } else {
-            // If we're just checking for any error
             assert.ok(e, message);
         }
     }
@@ -26,41 +25,48 @@ export function assertThrows(expectedError, fn, message) {
 
 /**
  * Helper to create and initialize an Abieos instance for testing
- * @returns {Object} Abieos instance with testing extensions
+ * @returns {Abieos} Abieos instance with testing extensions
  */
 export function setupAbieos() {
-    const abieos = Abieos.getInstance();
-    const loadedContracts = [];
+    const abieosInstance = Abieos.getInstance();
+    let instanceLoadedContracts = []; 
+
+    // Store the original loadAbi method if it hasn't been stored yet,
+    // binding it to the instance to ensure 'this' context is correct.
+    if (typeof abieosInstance._originalLoadAbi === 'undefined') {
+        abieosInstance._originalLoadAbi = abieosInstance.loadAbi.bind(abieosInstance);
+    }
     
-    // Extend the Abieos instance with the methods needed for testing
-    abieos.getLoadedAbis = function() {
-        return loadedContracts;
+    abieosInstance.getLoadedAbis = function() {
+        return instanceLoadedContracts;
     };
     
-    abieos.clearLoadedAbis = function() {
-        loadedContracts.forEach(contract => {
+    abieosInstance.clearLoadedAbis = function() {
+        const currentLoadedContracts = this.getLoadedAbis(); 
+        currentLoadedContracts.forEach(contract => {
             try {
-                this.deleteContract(contract);
-            } catch (e) {
-                // Ignore errors when deleting contracts
-            }
+                // Assuming deleteContract is a method on the Abieos instance
+                this.deleteContract(contract); 
+            } catch (e) { /* Ignore errors when deleting contracts */ }
         });
-        loadedContracts = [];
+        instanceLoadedContracts.length = 0; // Clear the array for this instance
         return true;
     };
     
-    // Override loadAbi to keep track of loaded contracts
-    const originalLoadAbi = abieos.loadAbi;
-    abieos.loadAbi = function(contractName, abi) {
-        // If contract already exists, return false to match expected behavior
-        if (loadedContracts.includes(contractName)) {
-            return false;
+    // Override loadAbi
+    abieosInstance.loadAbi = function(contractName, abi) { 
+        const currentLoadedContracts = this.getLoadedAbis();
+        if (currentLoadedContracts.includes(contractName)) {
+            return false; // Already loaded for this instance
         }
-        
         try {
-            const result = originalLoadAbi.call(this, contractName, abi);
-            if (result && !loadedContracts.includes(contractName)) {
-                loadedContracts.push(contractName);
+            // Call the stored original (native or previously bound) loadAbi method
+            const result = this._originalLoadAbi(contractName, abi);
+            if (result) {
+                // Ensure not to add if already present
+                if (!currentLoadedContracts.includes(contractName)) { 
+                    currentLoadedContracts.push(contractName);
+                }
             }
             return result;
         } catch (e) {
@@ -68,53 +74,46 @@ export function setupAbieos() {
         }
     };
     
-    // Add getType method that uses the native getTypeForAction if possible
-    // or returns the type name itself as the base type
-    abieos.getType = function(contractName, typeName) {
-        // For custom types, we just return the type name itself
-        // since the C++ implementation would need to resolve types
-        if (!loadedContracts.includes(contractName)) {
+    // Override getType (or add if it doesn't exist, based on original test logic)
+    abieosInstance.getType = function(contractName, typeName) { 
+        const currentLoadedContracts = this.getLoadedAbis();
+        if (!currentLoadedContracts.includes(contractName)) {
             throw new Error(`ABI for contract ${contractName} not found`);
         }
-        
-        // For types not found in the ABI, we need to throw an error
-        if (typeName === "non_existent_type") {
+        // Mock behavior from original tests for specific types:
+        if (typeName === "non_existent_type") { 
             throw new Error(`Type ${typeName} not found`);
         }
-        
-        // For custom types, return their base type
-        if (typeName === "my_custom_name") {
+        if (typeName === "my_custom_name") { 
             return "name";
         }
-        
-        // Otherwise just return the type name itself
-        return typeName;
+        // Default behavior from original tests for other types:
+        return typeName; 
     };
     
-    // Ensure hexTojson maps to hexToJson for case consistency
-    abieos.hexTojson = abieos.hexToJson;
+    // Alias for case consistency, assuming hexToJson is the correct/native method name
+    abieosInstance.hexTojson = abieosInstance.hexToJson; 
     
-    // Clear any existing ABIs
-    abieos.clearLoadedAbis();
+    // Initial clear for this specific instance's state
+    abieosInstance.clearLoadedAbis(); 
     
-    return abieos;
+    return abieosInstance;
 }
 
 /**
- * Helper function to test round-trip conversion
- * @param {Object} abieos - Abieos instance
- * @param {string} contract - Contract name
- * @param {string} type - Type name
- * @param {Object} data - Data to convert
- * @returns {string} Hex representation of data
+ * Helper function to test round-trip conversion.
+ * Assumes abieos.jsonToHex handles JSON.stringify internally.
+ * @param {Abieos} abieos - Abieos instance.
+ * @param {string} contract - Contract name.
+ * @param {string} type - Type name.
+ * @param {Object} data - Data to convert (JavaScript object).
+ * @returns {string} Hex representation of data.
  */
 export function testRoundTrip(abieos, contract, type, data) {
-    const jsonStr = JSON.stringify(data);
-    const hex = abieos.jsonToHex(contract, type, jsonStr);
+    const hex = abieos.jsonToHex(contract, type, data); // Pass JS object directly
     assert.ok(typeof hex === 'string' && hex.length > 0, `Serialization should produce hex for ${type}`);
     
     const roundTripped = abieos.hexToJson(contract, type, hex);
-    // hexToJson already returns parsed JSON, so no need to parse it again
     assert.deepStrictEqual(roundTripped, data, `Round-trip conversion should preserve data for ${type}`);
-    return hex; // Return hex for additional testing if needed
+    return hex; 
 }
