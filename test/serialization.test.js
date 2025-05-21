@@ -1,9 +1,10 @@
-import test from 'node:test';
 import assert from 'node:assert/strict';
-import { assertThrows, setupAbieos } from './test-helpers.js';
+import test from 'node:test';
+import { Abieos } from '../dist/abieos.js';
+import { assertThrows } from './utils/test-helpers.js';
 
 test.describe('Serialization (jsonToHex)', () => {
-    let abieos;
+    const abieos = Abieos.getInstance();
 
     const contractAccount = "test.token";
     const transferABI = {
@@ -22,10 +23,10 @@ test.describe('Serialization (jsonToHex)', () => {
         actions: [{ name: "transfer", type: "transfer", ricardian_contract: "" }],
     };
 
-    test.beforeEach(() => {
-        abieos = setupAbieos();
-        abieos.loadAbi(contractAccount, transferABI); 
-    });
+    Abieos.debug = true;
+    abieos.cleanup();
+    abieos.loadAbi(contractAccount, transferABI);
+
 
     test('should serialize valid transfer action data', () => {
         const actionData = {
@@ -75,7 +76,7 @@ test.describe('Serialization (jsonToHex)', () => {
         const actionData = {
             from: "alice",
             to: "bob",
-            quantity: 12345, 
+            quantity: 12345,
             memo: "test transfer"
         };
         assertThrows(

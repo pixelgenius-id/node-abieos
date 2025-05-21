@@ -1,12 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { assertThrows, setupAbieos } from './test-helpers.js';
+import { assertThrows } from './utils/test-helpers.js';
+import { Abieos } from '../dist/abieos.js';
 
 test.describe('ABI Management', () => {
     let abieos;
 
     test.beforeEach(() => {
-        abieos = setupAbieos();
+        abieos = Abieos.getInstance();
+        abieos.cleanup();
     });
 
     // Note: The inner 'test.describe' from the original file becomes the main content here.
@@ -38,10 +40,10 @@ test.describe('ABI Management', () => {
         assert.ok(loadedAbis.includes(contractAccount), 'Contract ABI should be in loaded ABIs');
     });
 
-    test('should return false when loading an already loaded ABI for the same contract', () => {
-        abieos.loadAbi(contractAccount, simpleABI); // First load
-        const result = abieos.loadAbi(contractAccount, simpleABI); // Attempt to load again
-        assert.strictEqual(result, false, 'loadAbi should return false for an already loaded ABI');
+    test('should be able load the ABI for a contract that was already loaded, updating it', () => {
+        abieos.loadAbi(contractAccount, simpleABI);
+        const result = abieos.loadAbi(contractAccount, simpleABI);
+        assert.strictEqual(result, true, 'loadAbi should return true for an already loaded ABI');
     });
 
     test('should throw an error when loading an invalid ABI structure (e.g. non-object ABI)', () => {
@@ -88,7 +90,7 @@ test.describe('ABI Management', () => {
 
     test('should clear all loaded ABIs', () => {
         abieos.loadAbi(contractAccount, simpleABI);
-        abieos.clearLoadedAbis();
+        abieos.cleanup();
         const loadedAbis = abieos.getLoadedAbis();
         assert.strictEqual(loadedAbis.length, 0, 'clearLoadedAbis should remove all ABIs');
     });

@@ -1,9 +1,10 @@
-import test from 'node:test';
 import assert from 'node:assert/strict';
-import { assertThrows, setupAbieos, testRoundTrip as globalTestRoundTrip } from './test-helpers.js';
+import test from 'node:test';
+import { assertThrows, testRoundTrip as globalTestRoundTrip } from './utils/test-helpers.js';
+import { Abieos } from '../dist/abieos.js';
 
 test.describe('Variant Types and Complex Structures', () => {
-    let abieos;
+    const abieos = Abieos.getInstance();
 
     const contract = 'complex.test';
     const complexAbi = {
@@ -27,10 +28,9 @@ test.describe('Variant Types and Complex Structures', () => {
         ]
     };
 
-    test.beforeEach(() => {
-        abieos = setupAbieos();
-        abieos.loadAbi(contract, complexAbi);
-    });
+    Abieos.debug = true;
+    abieos.cleanup();
+    abieos.loadAbi(contract, complexAbi);
 
     test('basic struct serialization/deserialization', () => {
         globalTestRoundTrip(abieos, contract, 's1', { x1: 10 });

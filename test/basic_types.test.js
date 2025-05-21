@@ -1,10 +1,10 @@
-import test from 'node:test';
 import assert from 'node:assert/strict';
-import { assertThrows, setupAbieos, testRoundTrip as globalTestRoundTrip } from './test-helpers.js';
+import test from 'node:test';
+import { Abieos } from '../dist/abieos.js';
+import { assertThrows, testRoundTrip as globalTestRoundTrip } from './utils/test-helpers.js';
 
 test.describe('Type Testing - Basic Types', () => {
-    let abieos;
-
+    const abieos = Abieos.getInstance();
     const contract = 'types.test';
     const basicTypesAbi = {
         version: 'eosio::abi/1.1',
@@ -29,21 +29,21 @@ test.describe('Type Testing - Basic Types', () => {
         variants: []
     };
 
-    test.beforeEach(() => {
-        abieos = setupAbieos();
-        abieos.loadAbi(contract, basicTypesAbi);
-    });
+    Abieos.debug = true;
+    abieos.cleanup();
+    abieos.loadAbi(contract, basicTypesAbi);
+
 
     test('boolean type serialization/deserialization', () => {
         globalTestRoundTrip(abieos, contract, 'bool_type', { value: true });
         globalTestRoundTrip(abieos, contract, 'bool_type', { value: false });
-        
+
         assertThrows(
             'failed to parse data',
             () => abieos.jsonToHex(contract, 'bool_type', { value: 'true' }),
             'Should reject string "true" as a boolean'
         );
-        
+
         assertThrows(
             'failed to parse data',
             () => abieos.jsonToHex(contract, 'bool_type', { value: 1 }),
@@ -55,13 +55,13 @@ test.describe('Type Testing - Basic Types', () => {
         globalTestRoundTrip(abieos, contract, 'int8_type', { value: -128 });
         globalTestRoundTrip(abieos, contract, 'int8_type', { value: 0 });
         globalTestRoundTrip(abieos, contract, 'int8_type', { value: 127 });
-        
+
         assertThrows(
             'failed to parse data',
             () => abieos.jsonToHex(contract, 'int8_type', { value: -129 }),
             'Should reject value below int8 min'
         );
-        
+
         assertThrows(
             'failed to parse data',
             () => abieos.jsonToHex(contract, 'int8_type', { value: 128 }),
@@ -72,13 +72,13 @@ test.describe('Type Testing - Basic Types', () => {
     test('uint8 type serialization/deserialization', () => {
         globalTestRoundTrip(abieos, contract, 'uint8_type', { value: 0 });
         globalTestRoundTrip(abieos, contract, 'uint8_type', { value: 255 });
-        
+
         assertThrows(
             'failed to parse data',
             () => abieos.jsonToHex(contract, 'uint8_type', { value: -1 }),
             'Should reject negative value for uint8'
         );
-        
+
         assertThrows(
             'failed to parse data',
             () => abieos.jsonToHex(contract, 'uint8_type', { value: 256 }),
@@ -90,13 +90,13 @@ test.describe('Type Testing - Basic Types', () => {
         globalTestRoundTrip(abieos, contract, 'int64_type', { value: "-9223372036854775808" });
         globalTestRoundTrip(abieos, contract, 'int64_type', { value: "0" });
         globalTestRoundTrip(abieos, contract, 'int64_type', { value: "9223372036854775807" });
-        
+
         assertThrows(
             'failed to parse data',
             () => abieos.jsonToHex(contract, 'int64_type', { value: "-9223372036854775809" }),
             'Should reject value below int64 min'
         );
-        
+
         assertThrows(
             'failed to parse data',
             () => abieos.jsonToHex(contract, 'int64_type', { value: "9223372036854775808" }),
@@ -107,13 +107,13 @@ test.describe('Type Testing - Basic Types', () => {
     test('uint64 type serialization/deserialization', () => {
         globalTestRoundTrip(abieos, contract, 'uint64_type', { value: "0" });
         globalTestRoundTrip(abieos, contract, 'uint64_type', { value: "18446744073709551615" });
-        
+
         assertThrows(
             'failed to parse data',
             () => abieos.jsonToHex(contract, 'uint64_type', { value: "-1" }),
             'Should reject negative value for uint64'
         );
-        
+
         assertThrows(
             'failed to parse data',
             () => abieos.jsonToHex(contract, 'uint64_type', { value: "18446744073709551616" }),
@@ -126,12 +126,12 @@ test.describe('Type Testing - Basic Types', () => {
         const float32Hex = abieos.jsonToHex(contract, 'float32_type', float32Data);
         const float32Result = abieos.hexToJson(contract, 'float32_type', float32Hex);
         assert.ok(Math.abs(float32Result.value - 1.1) < 0.00001, 'Float32 value should be approximately equal after roundtrip');
-        
+
         globalTestRoundTrip(abieos, contract, 'float32_type', { value: 0.0 });
         globalTestRoundTrip(abieos, contract, 'float64_type', { value: 0.0 });
         globalTestRoundTrip(abieos, contract, 'float64_type', { value: 1.1 });
         globalTestRoundTrip(abieos, contract, 'float64_type', { value: -1.1 });
-        
+
         assertThrows(
             'failed to parse data',
             () => abieos.jsonToHex(contract, 'float32_type', { value: "not a number" }),
@@ -143,13 +143,13 @@ test.describe('Type Testing - Basic Types', () => {
         globalTestRoundTrip(abieos, contract, 'array_type', { values: [] });
         globalTestRoundTrip(abieos, contract, 'array_type', { values: [1, 2, 3] });
         globalTestRoundTrip(abieos, contract, 'array_type', { values: [0, 255] });
-        
+
         assertThrows(
             'failed to parse data',
             () => abieos.jsonToHex(contract, 'array_type', { values: ["not a number"] }),
             'Should reject non-numeric values in uint8 array'
         );
-        
+
         assertThrows(
             'failed to parse data',
             () => abieos.jsonToHex(contract, 'array_type', { values: [256] }),
@@ -160,15 +160,15 @@ test.describe('Type Testing - Basic Types', () => {
     test('optional type serialization/deserialization', () => {
         globalTestRoundTrip(abieos, contract, 'optional_type', { value: "test string" });
         globalTestRoundTrip(abieos, contract, 'optional_type', { value: null });
-        
+
         const hexWithValue = abieos.jsonToHex(contract, 'optional_type', { value: "test string" });
         const hexWithNull = abieos.jsonToHex(contract, 'optional_type', { value: null });
-        
+
         assert.notEqual(hexWithValue, hexWithNull, 'Hex with optional value should differ from hex with null');
-        
+
         const jsonWithValue = abieos.hexToJson(contract, 'optional_type', hexWithValue);
         const jsonWithNull = abieos.hexToJson(contract, 'optional_type', hexWithNull);
-        
+
         assert.strictEqual(jsonWithValue.value, "test string", 'Deserialized optional should preserve string value');
         assert.strictEqual(jsonWithNull.value, null, 'Deserialized optional should preserve null value');
     });
