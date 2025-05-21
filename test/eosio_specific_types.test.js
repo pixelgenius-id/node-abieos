@@ -74,7 +74,7 @@ test.describe('EOSIO Specific Types', () => {
         });
         
         assertThrows(
-            /failed to parse data/i, // Adjusted regex for generic wrapper error
+            /Failed to convert JSON to hex.*Expected time point/i,
             () => abieos.jsonToHex(contract, 'time_types', {
                 time_point: "invalid time",
                 time_point_sec: "2023-05-21T12:34:56.000",
@@ -98,13 +98,13 @@ test.describe('EOSIO Specific Types', () => {
         assert.ok(isValidFormat, `Returned key ${result.value} should be in a valid format`);
 
         assertThrows(
-            /failed to parse data/i, // Adjusted regex
+            /Failed to convert JSON to hex.*Expected public key/i,
             () => abieos.jsonToHex(contract, 'public_key_type', { value: "invalid key" }),
             'Should reject invalid public key format'
         );
         
         assertThrows(
-            /failed to parse data/i, // Adjusted regex
+            /Failed to convert JSON to hex.*Expected key/i,
             () => abieos.jsonToHex(contract, 'public_key_type', { value: "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CZ" }), 
             'Should reject public key with invalid checksum'
         );

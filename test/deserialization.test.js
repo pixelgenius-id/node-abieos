@@ -43,8 +43,7 @@ test.describe('Deserialization (hexTojson)', () => {
     test('should throw if ABI for contract is not loaded during deserialization', () => {
         assert.throws(
             () => abieos.hexTojson("unknown.contract", "transfer", validHex),
-            // Error might be "contract ... not loaded" or a more generic "binary decode error" if context is missing
-            /failed to parse json string: contract "unknown.contract" is not loaded|failed to parse json string: binary decode error|failed to parse json string: unknown contract/i,
+            /Native error when converting hex to JSON.*binary decode error|Native error when converting hex to JSON.*contract.*not loaded|Native error when converting hex to JSON.*unknown contract/i,
             'Should throw if ABI is not loaded for deserialization'
         );
     });
@@ -52,7 +51,7 @@ test.describe('Deserialization (hexTojson)', () => {
     test('should throw if type is not found in ABI during deserialization', () => {
         assert.throws(
             () => abieos.hexTojson(contractAccount, "unknown_type", validHex),
-            /failed to parse json string: Type unknown_type not found|failed to parse json string: Unknown type/i,
+            /Native error when converting hex to JSON.*Unknown type/i,
             'Should throw if type is not found for deserialization'
         );
     });
@@ -61,7 +60,7 @@ test.describe('Deserialization (hexTojson)', () => {
         const invalidHex = "thisisnothex";
         assert.throws(
             () => abieos.hexTojson(contractAccount, "transfer", invalidHex),
-            /failed to parse json string: expected hex string/i,
+            /Native error when converting hex to JSON.*expected hex string/i,
             'Should throw for invalid hex string'
         );
     });
@@ -70,7 +69,7 @@ test.describe('Deserialization (hexTojson)', () => {
         const shortHex = "1234"; 
         assert.throws(
             () => abieos.hexTojson(contractAccount, "transfer", shortHex),
-            /failed to parse json string: Stream overrun/i,
+            /Native error when converting hex to JSON.*Stream overrun/i,
             'Should throw for malformed hex data'
         );
     });

@@ -37,13 +37,13 @@ test.describe('Variant Types and Complex Structures', () => {
         globalTestRoundTrip(abieos, contract, 's2', { y1: -5, y2: 5 });
         
         assertThrows(
-            /failed to parse data/i,
+            /Failed to convert JSON to hex.*number is out of range/i,
             () => abieos.jsonToHex(contract, 's1', { x1: 128 }),
             'Should reject int8 out of range'
         );
         
         assertThrows(
-            /failed to parse data/i,
+            /Failed to convert JSON to hex.*Expected field/i,
             () => abieos.jsonToHex(contract, 's2', { y1: 0 }), 
             'Should reject struct with missing required field'
         );
@@ -60,7 +60,7 @@ test.describe('Variant Types and Complex Structures', () => {
         assert.deepStrictEqual(jsonWithNull.b1, [1, 2, 3], 'Required array field should match');
         
         assertThrows(
-            /failed to parse data/i, 
+            /Failed to convert JSON to hex.*Expected field/i,
             () => abieos.jsonToHex(contract, 's_optional', { b1: [] }),
             'Should throw if optional field `a1` is missing but `b1` is present'
         );
@@ -73,19 +73,19 @@ test.describe('Variant Types and Complex Structures', () => {
         globalTestRoundTrip(abieos, contract, 'my_variant', ["s2", { y1: 30, y2: 40 }]);
         
         assertThrows(
-            /failed to parse data/i,
+            /Failed to convert JSON to hex.*Invalid type for variant/i,
             () => abieos.jsonToHex(contract, 'my_variant', ["unknown_type", 10]),
             'Should reject variant with unknown type'
         );
         
         assertThrows(
-            /failed to parse data/i,
+            /Failed to convert JSON to hex.*Expected field/i,
             () => abieos.jsonToHex(contract, 'my_variant', ["s1", { invalid: 10 }]),
             'Should reject variant with invalid struct field'
         );
         
         assertThrows(
-            /A string was expected/i, // Corrected Regex based on test output
+            /Expected three string arguments/i, // Updated Regex based on actual error
             () => abieos.jsonToHex(contract, 'my_variant', 10), 
             'Should reject variant that is not an array'
         );
@@ -97,7 +97,7 @@ test.describe('Variant Types and Complex Structures', () => {
         globalTestRoundTrip(abieos, contract, 's_with_variant', { v1: ["s2", { y1: 50, y2: 60 }], z1: 70 });
         
         assertThrows(
-            /failed to parse data/i,
+            /Failed to convert JSON to hex.*Expected field/i,
             () => abieos.jsonToHex(contract, 's_with_variant', { z1: 20 }),
             'Should reject struct missing variant field'
         );
@@ -117,7 +117,7 @@ test.describe('Variant Types and Complex Structures', () => {
         });
         
         assertThrows(
-            /failed to parse data/i,
+            /Failed to convert JSON to hex.*Expected field/i,
             () => abieos.jsonToHex(contract, 's_nested', { z1: 10, z2: ["int8", 20] }),
             'Should reject nested struct with missing required field z3'
         );
