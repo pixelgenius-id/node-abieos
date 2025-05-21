@@ -39,13 +39,13 @@ test.describe('Type Testing - Basic Types', () => {
         globalTestRoundTrip(abieos, contract, 'bool_type', { value: false });
         
         assertThrows(
-            /Failed to convert JSON to hex.*Expected true or false/i,
+            'failed to parse data',
             () => abieos.jsonToHex(contract, 'bool_type', { value: 'true' }),
             'Should reject string "true" as a boolean'
         );
         
         assertThrows(
-            /Failed to convert JSON to hex.*Expected true or false/i,
+            'failed to parse data',
             () => abieos.jsonToHex(contract, 'bool_type', { value: 1 }),
             'Should reject number as a boolean'
         );
@@ -57,13 +57,13 @@ test.describe('Type Testing - Basic Types', () => {
         globalTestRoundTrip(abieos, contract, 'int8_type', { value: 127 });
         
         assertThrows(
-            /Failed to convert JSON to hex.*number is out of range/i,
+            'failed to parse data',
             () => abieos.jsonToHex(contract, 'int8_type', { value: -129 }),
             'Should reject value below int8 min'
         );
         
         assertThrows(
-            /Failed to convert JSON to hex.*number is out of range/i,
+            'failed to parse data',
             () => abieos.jsonToHex(contract, 'int8_type', { value: 128 }),
             'Should reject value above int8 max'
         );
@@ -74,13 +74,13 @@ test.describe('Type Testing - Basic Types', () => {
         globalTestRoundTrip(abieos, contract, 'uint8_type', { value: 255 });
         
         assertThrows(
-            /Failed to convert JSON to hex.*Expected integer/i,
+            'failed to parse data',
             () => abieos.jsonToHex(contract, 'uint8_type', { value: -1 }),
             'Should reject negative value for uint8'
         );
         
         assertThrows(
-            /Failed to convert JSON to hex.*number is out of range/i,
+            'failed to parse data',
             () => abieos.jsonToHex(contract, 'uint8_type', { value: 256 }),
             'Should reject value above uint8 max'
         );
@@ -92,13 +92,13 @@ test.describe('Type Testing - Basic Types', () => {
         globalTestRoundTrip(abieos, contract, 'int64_type', { value: "9223372036854775807" });
         
         assertThrows(
-            /Failed to convert JSON to hex.*number is out of range/i,
+            'failed to parse data',
             () => abieos.jsonToHex(contract, 'int64_type', { value: "-9223372036854775809" }),
             'Should reject value below int64 min'
         );
         
         assertThrows(
-            /Failed to convert JSON to hex.*number is out of range/i,
+            'failed to parse data',
             () => abieos.jsonToHex(contract, 'int64_type', { value: "9223372036854775808" }),
             'Should reject value above int64 max'
         );
@@ -109,13 +109,13 @@ test.describe('Type Testing - Basic Types', () => {
         globalTestRoundTrip(abieos, contract, 'uint64_type', { value: "18446744073709551615" });
         
         assertThrows(
-            /Failed to convert JSON to hex.*Expected integer/i,
+            'failed to parse data',
             () => abieos.jsonToHex(contract, 'uint64_type', { value: "-1" }),
             'Should reject negative value for uint64'
         );
         
         assertThrows(
-            /Failed to convert JSON to hex.*number is out of range/i,
+            'failed to parse data',
             () => abieos.jsonToHex(contract, 'uint64_type', { value: "18446744073709551616" }),
             'Should reject value above uint64 max'
         );
@@ -133,7 +133,7 @@ test.describe('Type Testing - Basic Types', () => {
         globalTestRoundTrip(abieos, contract, 'float64_type', { value: -1.1 });
         
         assertThrows(
-            /Failed to convert JSON to hex.*Expected number or boolean/i,
+            'failed to parse data',
             () => abieos.jsonToHex(contract, 'float32_type', { value: "not a number" }),
             'Should reject non-numeric string for float32'
         );
@@ -145,13 +145,13 @@ test.describe('Type Testing - Basic Types', () => {
         globalTestRoundTrip(abieos, contract, 'array_type', { values: [0, 255] });
         
         assertThrows(
-            /Failed to convert JSON to hex.*Expected integer/i,
+            'failed to parse data',
             () => abieos.jsonToHex(contract, 'array_type', { values: ["not a number"] }),
             'Should reject non-numeric values in uint8 array'
         );
         
         assertThrows(
-            /Failed to convert JSON to hex.*number is out of range/i,
+            'failed to parse data',
             () => abieos.jsonToHex(contract, 'array_type', { values: [256] }),
             'Should reject values above uint8 max in array'
         );

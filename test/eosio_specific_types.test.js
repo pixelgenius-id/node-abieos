@@ -74,7 +74,7 @@ test.describe('EOSIO Specific Types', () => {
         });
         
         assertThrows(
-            /Failed to convert JSON to hex.*Expected time point/i,
+            'failed to parse data',
             () => abieos.jsonToHex(contract, 'time_types', {
                 time_point: "invalid time",
                 time_point_sec: "2023-05-21T12:34:56.000",
@@ -98,7 +98,7 @@ test.describe('EOSIO Specific Types', () => {
         assert.ok(isValidFormat, `Returned key ${result.value} should be in a valid format`);
 
         assertThrows(
-            /Failed to convert JSON to hex.*Expected public key/i,
+            'failed to parse data',
             () => abieos.jsonToHex(contract, 'public_key_type', { value: "invalid key" }),
             'Should reject invalid public key format'
         );

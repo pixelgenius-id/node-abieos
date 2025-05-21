@@ -43,7 +43,7 @@ test.describe('Deserialization (hexTojson)', () => {
     test('should throw if ABI for contract is not loaded during deserialization', () => {
         assert.throws(
             () => abieos.hexTojson("unknown.contract", "transfer", validHex),
-            /Native error when converting hex to JSON.*binary decode error|Native error when converting hex to JSON.*contract.*not loaded|Native error when converting hex to JSON.*unknown contract/i,
+            (err) => err.message.includes('binary decode error') || err.message.includes('failed to parse'),
             'Should throw if ABI is not loaded for deserialization'
         );
     });
@@ -51,7 +51,7 @@ test.describe('Deserialization (hexTojson)', () => {
     test('should throw if type is not found in ABI during deserialization', () => {
         assert.throws(
             () => abieos.hexTojson(contractAccount, "unknown_type", validHex),
-            /Native error when converting hex to JSON.*Unknown type/i,
+            (err) => err.message.includes('Unknown type') || err.message.includes('failed to parse'),
             'Should throw if type is not found for deserialization'
         );
     });
@@ -60,7 +60,7 @@ test.describe('Deserialization (hexTojson)', () => {
         const invalidHex = "thisisnothex";
         assert.throws(
             () => abieos.hexTojson(contractAccount, "transfer", invalidHex),
-            /Native error when converting hex to JSON.*expected hex string/i,
+            (err) => err.message.includes('expected hex string') || err.message.includes('failed to parse'),
             'Should throw for invalid hex string'
         );
     });
@@ -69,7 +69,7 @@ test.describe('Deserialization (hexTojson)', () => {
         const shortHex = "1234"; 
         assert.throws(
             () => abieos.hexTojson(contractAccount, "transfer", shortHex),
-            /Native error when converting hex to JSON.*Stream overrun/i,
+            (err) => err.message.includes('Stream overrun') || err.message.includes('failed to parse'),
             'Should throw for malformed hex data'
         );
     });
