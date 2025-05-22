@@ -23,7 +23,7 @@
     "clean": "cmake-js clean",
     "build:win": "cmake-js",
     "build:mac": "cmake-js",
-    "update_version": "node update-version.mjs"
+    "update_version": "node scripts/update-version.mjs"
   },
   "repository": {
     "type": "git",
@@ -45,6 +45,8 @@
     "typescript": "5.8.3"
   },
   "binary": {
-    "napi_versions": [10]
+    "napi_versions": [
+      10
+    ]
   }
 }

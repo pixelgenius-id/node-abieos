@@ -1,7 +1,9 @@
 import {promises} from "node:fs";
 import {exec} from "node:child_process";
 
-const oldPackageJson = await promises.readFile('package.json', 'utf8');
+const packageJsonPath = './package.json';
+
+const oldPackageJson = await promises.readFile(packageJsonPath, 'utf8');
 if (!oldPackageJson) {
     console.error('Failed to read package.json');
     process.exit(1);
@@ -24,7 +26,7 @@ exec('git rev-parse --short HEAD', {
     console.log(`New version: ${newVersion}`);
     parsed.version = newVersion;
     const newPackageJson = JSON.stringify(parsed, null, 2);
-    promises.writeFile('package.json', newPackageJson).catch((err) => {
+    promises.writeFile(packageJsonPath, newPackageJson).catch((err) => {
         console.error('Failed to write package.json');
         process.exit(1);
     });
