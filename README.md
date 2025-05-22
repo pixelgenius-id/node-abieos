@@ -41,14 +41,14 @@ const abieos = Abieos.getInstance();
 
 Deno
 
-```typescript
-// examples/basic.cjs can be run with:
-// deno run --allow-ffi --allow-read examples/basic.cjs
+```bash
+# examples/basic.cjs can be run with:
+deno run --allow-ffi --allow-read examples/basic.cjs
 
-// For an example using the published npm package with Deno:
-// Check the examples/deno-abieos-test folder
-// cd examples/deno-abieos-test
-// deno run --allow-ffi --allow-read main.ts
+# For an example using the published npm package with Deno:
+# Check the examples/deno-abieos-test folder
+cd examples/deno-abieos-test
+deno run --allow-ffi --allow-read main.ts
 ```
 
 Bun
