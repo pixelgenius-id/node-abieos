@@ -16,29 +16,51 @@ Made with ♥ by [EOS Rio](https://eosrio.io/)
 
 - Typescript typings included
 - Prebuilt binary included (Clang 18 required to build)
+- Now supports NodeJS, Deno, and Bun runtimes.
 
-### Install
+## Install
 
 ```shell script
 npm i @eosrio/node-abieos --save
 ```
 
-### Usage
+## Usage
 
 CommonJS
+
 ```js
 const nodeAbieos = require('@eosrio/node-abieos');
 ```
 
-ES Modules
+ES Modules (NodeJS, Bun)
+
 ```typescript
 import {Abieos} from "@eosrio/node-abieos";
 const abieos = Abieos.getInstance();
 ```
 
+Deno
+
+```typescript
+// examples/basic.cjs can be run with:
+// deno run --allow-ffi --allow-read examples/basic.cjs
+
+// For an example using the published npm package with Deno:
+// Check the examples/deno-abieos-test folder
+// cd examples/deno-abieos-test
+// deno run --allow-ffi --allow-read main.ts
+```
+
+Bun
+
+```shell script
+# examples/basic.mjs can be run with:
+bun run examples/basic.mjs
+```
+
 Check the [/examples](https://github.com/eosrio/node-abieos/tree/master/examples) folder for implementation examples
 
-### Building
+## Building
 
 Make sure you have Clang installed on your system:
 We recommend using Clang 18 to build the `abieos` C++ library.
@@ -50,6 +72,7 @@ sudo ./llvm.sh 18
 ```
 
 Clone and Build
+
 ```shell script
 git clone https://github.com/eosrio/node-abieos.git --recursive
 cd node-abieos
