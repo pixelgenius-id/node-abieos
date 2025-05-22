@@ -42,8 +42,8 @@ test.describe('Serialization (jsonToHex)', () => {
     test('should throw if ABI for contract is not loaded', () => {
         const actionData = { from: "a", to: "b", quantity: "1.0 EOS", memo: "m" };
         assertThrows(
-            /failed to parse data/i,
-            () => abieos.jsonToHex("unknown.contract", "transfer", actionData),
+            /is not loaded/i,
+            () => abieos.jsonToHex("unknown", "transfer", actionData),
             'Should throw if ABI is not loaded'
         );
     });
@@ -51,7 +51,7 @@ test.describe('Serialization (jsonToHex)', () => {
     test('should throw if type is not found in ABI', () => {
         const actionData = { from: "a", to: "b", quantity: "1.0 EOS", memo: "m" };
         assertThrows(
-            /failed to parse data/i,
+            /Unknown type/i,
             () => abieos.jsonToHex(contractAccount, "unknown_type", actionData),
             'Should throw if type is not found'
         );
@@ -64,7 +64,7 @@ test.describe('Serialization (jsonToHex)', () => {
             memo: "test transfer"
         };
         assertThrows(
-            /failed to parse data/i,
+            /Expected field/i,
             () => abieos.jsonToHex(contractAccount, "transfer", actionData),
             'Should throw for missing required fields'
         );
@@ -78,7 +78,7 @@ test.describe('Serialization (jsonToHex)', () => {
             memo: "test transfer"
         };
         assertThrows(
-            /failed to parse data/i,
+            /Expected symbol code/i,
             () => abieos.jsonToHex(contractAccount, "transfer", actionData),
             'Should throw for incorrect data types'
         );

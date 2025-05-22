@@ -12,18 +12,14 @@ export function assertThrows(expectedError, fn, message) {
         fn();
         assert.fail(message || 'Expected function to throw an error');
     } catch (e) {
-        // Search for Abieos log tag in the error message
-        if (e.message.includes(Abieos.logTag)) {
-            // Test passes since an error was thrown, which is what we expect
+        if (!expectedError && e.message.includes(Abieos.logTag)) {
+            // If no expected error is provided, but the error message contains the log tag,
             return;
         }
-
         if (expectedError instanceof RegExp) {
             assert.match(e.message, expectedError, message);
         } else if (typeof expectedError === 'string') {
             assert.strictEqual(e.message, expectedError, message);
-        } else {
-            assert.ok(e, message);
         }
     }
 }
