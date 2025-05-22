@@ -66,6 +66,7 @@ var Abieos = class _Abieos {
    * This is useful for freeing up resources and ensuring a clean state.
    */
   cleanup() {
+    const errors = [];
     _Abieos.loadedContracts.forEach((_, contractName) => {
       try {
         if (_Abieos.debug) {
@@ -74,9 +75,13 @@ var Abieos = class _Abieos {
         _Abieos.native.delete_contract(contractName);
         _Abieos.loadedContracts.delete(contractName);
       } catch (e) {
+        errors.push({ contractName, error: e.message });
         console.error(`${_Abieos.logTag} Failed to delete contract '${contractName}' during cleanup: ${e.message}`);
       }
     });
+    if (errors.length > 0) {
+      throw new Error(`${_Abieos.logTag} Errors during cleanup: ${JSON.stringify(errors)}`);
+    }
   }
   /**
    * Converts a string name to its corresponding 64-bit unsigned integer representation (BigInt).

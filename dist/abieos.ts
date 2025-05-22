@@ -47,6 +47,7 @@ export class Abieos {
      */
     public cleanup(): void {
         /* node:coverage disable */
+        const errors: any[] = [];
         Abieos.loadedContracts.forEach((_, contractName) => {
             try {
                 if (Abieos.debug) {
@@ -55,10 +56,14 @@ export class Abieos {
                 Abieos.native.delete_contract(contractName);
                 Abieos.loadedContracts.delete(contractName);
             } catch (e: any) {
+                errors.push({ contractName, error: e.message });
                 console.error(`${Abieos.logTag} Failed to delete contract '${contractName}' during cleanup: ${e.message}`);
             }
         });
-        /* node:coverage enable */ 
+        if (errors.length > 0) {
+            throw new Error(`${Abieos.logTag} Errors during cleanup: ${JSON.stringify(errors)}`);
+        }
+        /* node:coverage enable */
     }
 
     /**

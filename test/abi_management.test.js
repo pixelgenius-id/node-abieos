@@ -104,12 +104,14 @@ test.describe('ABI Management', () => {
     test('cleanup should throw if an invalid contract name is found in the contracts map', () => {
         abieos.loadAbi(contractAccount, simpleABI);
         // Simulate an invalid contract name by directly manipulating the loadedContracts map
-        Abieos.loadedContracts.set("invalid_contract_name", "invalid_value");
+        Abieos.loadedContracts.set(0, Date.now());
         assertThrows(
-            /Invalid contract name/i,
+            /Errors during cleanup/i,
             () => abieos.cleanup(),
             'cleanup should throw for invalid contract names'
         );
+        // Clean up the invalid contract name
+        Abieos.loadedContracts.delete(0);
     });
 
     test('cleanup should not throw if no contract was loaded', () => {
