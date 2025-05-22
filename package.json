@@ -1,9 +1,9 @@
 {
   "name": "@eosrio/node-abieos",
-  "version": "4.0.1-2039717",
+  "version": "4.0.2-2039717",
   "publishConfig": {
     "access": "public",
-    "tag": "abieos"
+    "tag": "latest"
   },
   "description": "Node Bindings for abieos: Binary <> JSON conversion using ABIs.",
   "main": "./dist/abieos.js",
