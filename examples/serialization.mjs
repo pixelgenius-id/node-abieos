@@ -22,9 +22,10 @@ async function loadAbiFromBlockchain(contractName) {
 
 // Define the JSON data to be converted
 const json = {
-    user: "john",
-    action: "buy",
-    amount: "100.0000 EOS"
+    from: "alice",
+    to: "bob",
+    quantity: "10.0000 EOS",
+    memo: "Test transfer"
 };
 
 // Main function to demonstrate the usage
