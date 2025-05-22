@@ -14,16 +14,15 @@
   },
   "scripts": {
     "install": "node -e 'process.exit(0)'",
+    "build:linux": "cmake-js compile && node scripts/copy-module.mjs",
+    "build": "tsup",
     "test": "node --test test/**/*.test.js",
-    "test:examples": "cd examples && node basic.mjs",
     "test:coverage": "node --test --experimental-test-coverage test/**/*.test.js",
-    "test:watch": "node --test --watch test/**/*.test.js",
+    "test:watch": "node --test --watch --experimental-test-coverage test/**/*.test.js",
     "tsc:watch": "tsc --watch",
     "clean": "cmake-js clean",
-    "build": "tsup",
-    "build:linux": "cmake-js compile --cc /usr/bin/clang-18 --cxx /usr/bin/clang++-18 && cp build/Release/node_abieos.node lib/abieos.node",
-    "build:linux:ci": "cmake-js compile && cp build/Release/node_abieos.node lib/abieos.node",
     "build:win": "cmake-js",
+    "build:mac": "cmake-js",
     "update_version": "node update-version.mjs"
   },
   "repository": {
@@ -46,8 +45,6 @@
     "typescript": "5.8.3"
   },
   "binary": {
-    "napi_versions": [
-      10
-    ]
+    "napi_versions": [10]
   }
 }

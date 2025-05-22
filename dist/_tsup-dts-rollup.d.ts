@@ -4,6 +4,7 @@
  * which manages internal state and resources.
  */
 export declare class Abieos {
+    static logTag: string;
     private static instance;
     static native: typeof abieos;
     private static loadedContracts;
@@ -19,6 +20,12 @@ export declare class Abieos {
      * @returns {Abieos} The singleton instance of Abieos.
      */
     static getInstance(): Abieos;
+    getLoadedAbis(): string[];
+    /**
+     * Cleans up all loaded contracts by deleting them from the native context.
+     * This is useful for freeing up resources and ensuring a clean state.
+     */
+    cleanup(): void;
     /**
      * Converts a string name to its corresponding 64-bit unsigned integer representation (BigInt).
      * @param {string} nameString The string name to convert.

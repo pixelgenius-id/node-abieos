@@ -32,7 +32,7 @@ test.describe('Deserialization (hexTojson)', () => {
     Abieos.debug = true;
     abieos.cleanup();
     abieos.loadAbi(contractAccount, transferABI);
-    
+
     validHex = abieos.jsonToHex(contractAccount, "transfer", transferActionData);
 
     test('should deserialize valid hex data for transfer action', () => {
@@ -73,4 +73,23 @@ test.describe('Deserialization (hexTojson)', () => {
             'Should throw for malformed hex data'
         );
     });
+
+    test('binToJson should throw for invalid hex string', () => {
+        const invalidHex = "thisisnothex";
+        assert.throws(
+            () => abieos.binToJson(contractAccount, "transfer", invalidHex),
+            (err) => err.message.includes('Expected two string arguments and one buffer'),
+            'Should throw for invalid hex string'
+        );
+    });
+
+    test('binToJson should throw for valid Buffer that does not conform to the type', () => {
+        const shortHex = "1234";
+        assert.throws(
+            () => abieos.binToJson(contractAccount, "transfer", Buffer.from(shortHex, 'hex')),
+            (err) => err.message.includes('Stream overrun'),
+            'Should throw for malformed hex data'
+        );
+    });
+
 });

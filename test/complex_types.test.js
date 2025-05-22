@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { assertThrows, testRoundTrip as globalTestRoundTrip } from './utils/test-helpers.js';
 import { Abieos } from '../dist/abieos.js';
+import { assertThrows, testRoundTrip as globalTestRoundTrip } from './utils/test-helpers.js';
 
 test.describe('Variant Types and Complex Structures', () => {
     const abieos = Abieos.getInstance();
@@ -15,11 +15,13 @@ test.describe('Variant Types and Complex Structures', () => {
             { name: 's2', base: '', fields: [{ name: 'y1', type: 'int8' }, { name: 'y2', type: 'int8' }] },
             { name: 's_optional', base: '', fields: [{ name: 'a1', type: 'int8?' }, { name: 'b1', type: 'int8[]' }] },
             { name: 's_with_variant', base: '', fields: [{ name: 'v1', type: 'my_variant' }, { name: 'z1', type: 'int8' }] },
-            { name: 's_nested', base: '', fields: [
-                { name: 'z1', type: 'int8' },
-                { name: 'z2', type: 'my_variant' },
-                { name: 'z3', type: 's_optional' }
-            ]}
+            {
+                name: 's_nested', base: '', fields: [
+                    { name: 'z1', type: 'int8' },
+                    { name: 'z2', type: 'my_variant' },
+                    { name: 'z3', type: 's_optional' }
+                ]
+            }
         ],
         actions: [],
         tables: [],
@@ -35,30 +37,30 @@ test.describe('Variant Types and Complex Structures', () => {
     test('basic struct serialization/deserialization', () => {
         globalTestRoundTrip(abieos, contract, 's1', { x1: 10 });
         globalTestRoundTrip(abieos, contract, 's2', { y1: -5, y2: 5 });
-        
+
         assertThrows(
             'failed to parse data',
             () => abieos.jsonToHex(contract, 's1', { x1: 128 }),
             'Should reject int8 out of range'
         );
-        
+
         assertThrows(
             'failed to parse data',
-            () => abieos.jsonToHex(contract, 's2', { y1: 0 }), 
+            () => abieos.jsonToHex(contract, 's2', { y1: 0 }),
             'Should reject struct with missing required field'
         );
     });
 
     test('struct with optionals serialization/deserialization', () => {
         globalTestRoundTrip(abieos, contract, 's_optional', { a1: 10, b1: [1, 2, 3] });
-        
+
         const optionalData = { a1: null, b1: [1, 2, 3] };
         const hexWithNull = abieos.jsonToHex(contract, 's_optional', optionalData);
         const jsonWithNull = abieos.hexToJson(contract, 's_optional', hexWithNull);
-        
+
         assert.strictEqual(jsonWithNull.a1, null, 'Deserialized optional should be null');
         assert.deepStrictEqual(jsonWithNull.b1, [1, 2, 3], 'Required array field should match');
-        
+
         assertThrows(
             'failed to parse data',
             () => abieos.jsonToHex(contract, 's_optional', { b1: [] }),
@@ -71,22 +73,22 @@ test.describe('Variant Types and Complex Structures', () => {
         globalTestRoundTrip(abieos, contract, 'my_variant', ["int8", 10]);
         globalTestRoundTrip(abieos, contract, 'my_variant', ["s1", { x1: 20 }]);
         globalTestRoundTrip(abieos, contract, 'my_variant', ["s2", { y1: 30, y2: 40 }]);
-        
+
         assertThrows(
             'failed to parse data',
             () => abieos.jsonToHex(contract, 'my_variant', ["unknown_type", 10]),
             'Should reject variant with unknown type'
         );
-        
+
         assertThrows(
             'failed to parse data',
             () => abieos.jsonToHex(contract, 'my_variant', ["s1", { invalid: 10 }]),
             'Should reject variant with invalid struct field'
         );
-        
+
         assertThrows(
             'A string was expected',
-            () => abieos.jsonToHex(contract, 'my_variant', 10), 
+            () => abieos.jsonToHex(contract, 'my_variant', 10),
             'Should reject variant that is not an array'
         );
     });
@@ -95,7 +97,7 @@ test.describe('Variant Types and Complex Structures', () => {
         globalTestRoundTrip(abieos, contract, 's_with_variant', { v1: ["int8", 10], z1: 20 });
         globalTestRoundTrip(abieos, contract, 's_with_variant', { v1: ["s1", { x1: 30 }], z1: 40 });
         globalTestRoundTrip(abieos, contract, 's_with_variant', { v1: ["s2", { y1: 50, y2: 60 }], z1: 70 });
-        
+
         assertThrows(
             'failed to parse data',
             () => abieos.jsonToHex(contract, 's_with_variant', { z1: 20 }),
@@ -109,13 +111,13 @@ test.describe('Variant Types and Complex Structures', () => {
             z2: ["int8", 20],
             z3: { a1: 30, b1: [40, 50] }
         });
-        
+
         globalTestRoundTrip(abieos, contract, 's_nested', {
             z1: 10,
             z2: ["s1", { x1: 20 }],
             z3: { a1: null, b1: [] }
         });
-        
+
         assertThrows(
             'failed to parse data',
             () => abieos.jsonToHex(contract, 's_nested', { z1: 10, z2: ["int8", 20] }),

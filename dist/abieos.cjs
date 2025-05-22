@@ -32,6 +32,7 @@ var importMetaUrl = /* @__PURE__ */ getImportMetaUrl();
 var import_module = require("module");
 var abieos = (0, import_module.createRequire)(importMetaUrl)("./abieos.node");
 var Abieos = class _Abieos {
+  static logTag = "[node-abieos]";
   static instance;
   static native;
   static loadedContracts = /* @__PURE__ */ new Map();
@@ -42,7 +43,7 @@ var Abieos = class _Abieos {
    */
   constructor() {
     if (_Abieos.instance) {
-      throw new Error("Abieos is a Singleton class. Use Abieos.getInstance() to get the instance.");
+      throw new Error(`${_Abieos.logTag} Abieos is a Singleton class. Use Abieos.getInstance() to get the instance.`);
     }
     _Abieos.native = abieos;
   }
@@ -57,6 +58,26 @@ var Abieos = class _Abieos {
     }
     return _Abieos.instance;
   }
+  getLoadedAbis() {
+    return Array.from(_Abieos.loadedContracts.keys());
+  }
+  /**
+   * Cleans up all loaded contracts by deleting them from the native context.
+   * This is useful for freeing up resources and ensuring a clean state.
+   */
+  cleanup() {
+    _Abieos.loadedContracts.forEach((_, contractName) => {
+      try {
+        if (_Abieos.debug) {
+          console.log(`${_Abieos.logTag} Cleaning up contract '${contractName}'...`);
+        }
+        _Abieos.native.delete_contract(contractName);
+        _Abieos.loadedContracts.delete(contractName);
+      } catch (e) {
+        console.error(`${_Abieos.logTag} Failed to delete contract '${contractName}' during cleanup: ${e.message}`);
+      }
+    });
+  }
   /**
    * Converts a string name to its corresponding 64-bit unsigned integer representation (BigInt).
    * @param {string} nameString The string name to convert.
@@ -66,7 +87,7 @@ var Abieos = class _Abieos {
     try {
       return _Abieos.native.string_to_name(nameString);
     } catch (e) {
-      throw new Error(`[node-abieos] Failed to convert string to name '${nameString}': ${e.message}`);
+      throw new Error(`${_Abieos.logTag} Failed to convert string to name '${nameString}': ${e.message}`);
     }
   }
   /**
@@ -82,7 +103,7 @@ var Abieos = class _Abieos {
     try {
       return _Abieos.native.json_to_hex(contractName, type, jsonData);
     } catch (e) {
-      throw new Error(`[node-abieos] Failed to convert JSON to hex for contract '${contractName}', type '${type}': ${e.message}`);
+      throw new Error(`${_Abieos.logTag} Failed to convert JSON to hex for contract '${contractName}', type '${type}': ${e.message}`);
     }
   }
   /**
@@ -99,10 +120,10 @@ var Abieos = class _Abieos {
       try {
         return JSON.parse(data);
       } catch (parseError) {
-        throw new Error(`[node-abieos] Failed to parse JSON string from hex for contract '${contractName}', type '${type}'. Received: ${data}. Parse error: ${parseError.message}`);
+        throw new Error(`${_Abieos.logTag} Failed to parse JSON string from hex for contract '${contractName}', type '${type}'. Received: ${data}. Parse error: ${parseError.message}`);
       }
     } catch (e) {
-      throw new Error(`[node-abieos] Native error when converting hex to JSON for contract '${contractName}', type '${type}': ${e.message}`);
+      throw new Error(`${_Abieos.logTag} Native error when converting hex to JSON for contract '${contractName}', type '${type}': ${e.message}`);
     }
   }
   /**
@@ -119,10 +140,10 @@ var Abieos = class _Abieos {
       try {
         return JSON.parse(data);
       } catch (parseError) {
-        throw new Error(`[node-abieos] Failed to parse JSON string from binary for contract '${contractName}', type '${type}'. Received: ${data}. Parse error: ${parseError.message}`);
+        throw new Error(`${_Abieos.logTag} Failed to parse JSON string from binary for contract '${contractName}', type '${type}'. Received: ${data}. Parse error: ${parseError.message}`);
       }
     } catch (e) {
-      throw new Error(`[node-abieos] Native error when converting binary to JSON for contract '${contractName}', type '${type}': ${e.message}`);
+      throw new Error(`${_Abieos.logTag} Native error when converting binary to JSON for contract '${contractName}', type '${type}': ${e.message}`);
     }
   }
   /**
@@ -133,21 +154,24 @@ var Abieos = class _Abieos {
    * @throws {Error} If the ABI format is invalid or loading fails.
    */
   loadAbi(contractName, abi) {
+    if (_Abieos.debug && _Abieos.loadedContracts.has(contractName)) {
+      console.info(`${_Abieos.logTag} Contract '${contractName}' is already loaded. Updating ABI...`);
+    }
     const abiString = typeof abi === "object" ? JSON.stringify(abi) : abi;
     if (typeof abiString !== "string") {
-      throw new Error("[node-abieos] ABI must be a String or Object.");
+      throw new Error(`${_Abieos.logTag} ABI must be a String or Object.`);
     }
     try {
       const loaded = _Abieos.native.load_abi(contractName, abiString);
       if (loaded) {
         _Abieos.loadedContracts.set(contractName, Date.now());
         if (_Abieos.debug) {
-          console.log(`[node-abieos] Loaded ABI for contract '${contractName}'.`);
+          console.log(`${_Abieos.logTag} Loaded ABI for contract '${contractName}'.`);
         }
       }
       return loaded;
     } catch (e) {
-      throw new Error(`[node-abieos] Failed to load ABI for contract '${contractName}': ${e.message}`);
+      throw new Error(`${_Abieos.logTag} Failed to load ABI for contract '${contractName}': ${e.message}`);
     }
   }
   /**
@@ -159,19 +183,22 @@ var Abieos = class _Abieos {
    */
   loadAbiHex(contractName, abihex) {
     if (typeof abihex !== "string") {
-      throw new Error("[node-abieos] ABI hex must be a String.");
+      throw new Error(`${_Abieos.logTag} ABI hex must be a String.`);
+    }
+    if (_Abieos.debug && _Abieos.loadedContracts.has(contractName)) {
+      console.info(`${_Abieos.logTag} Contract '${contractName}' is already loaded. Updating ABI...`);
     }
     try {
       const loaded = _Abieos.native.load_abi_hex(contractName, abihex);
       if (loaded) {
         _Abieos.loadedContracts.set(contractName, Date.now());
         if (_Abieos.debug) {
-          console.log(`[node-abieos] Loaded ABI hex for contract '${contractName}'.`);
+          console.log(`${_Abieos.logTag} Loaded ABI hex for contract '${contractName}'.`);
         }
       }
       return loaded;
     } catch (e) {
-      throw new Error(`[node-abieos] Failed to load ABI hex for contract '${contractName}': ${e.message}`);
+      throw new Error(`${_Abieos.logTag} Failed to load ABI hex for contract '${contractName}': ${e.message}`);
     }
   }
   /**
@@ -185,7 +212,7 @@ var Abieos = class _Abieos {
     try {
       return _Abieos.native.get_type_for_action(contractName, actionName);
     } catch (e) {
-      throw new Error(`[node-abieos] Failed to get type for action '${actionName}' in contract '${contractName}': ${e.message}`);
+      throw new Error(`${_Abieos.logTag} Failed to get type for action '${actionName}' in contract '${contractName}': ${e.message}`);
     }
   }
   /**
@@ -199,7 +226,7 @@ var Abieos = class _Abieos {
     try {
       return _Abieos.native.get_type_for_table(contractName, table_name);
     } catch (e) {
-      throw new Error(`[node-abieos] Failed to get type for table '${table_name}' in contract '${contractName}': ${e.message}`);
+      throw new Error(`${_Abieos.logTag} Failed to get type for table '${table_name}' in contract '${contractName}': ${e.message}`);
     }
   }
   /**
@@ -214,12 +241,12 @@ var Abieos = class _Abieos {
       if (deleted) {
         _Abieos.loadedContracts.delete(contractName);
         if (_Abieos.debug) {
-          console.log(`[node-abieos] Deleted contract '${contractName}' from abieos context.`);
+          console.log(`${_Abieos.logTag} Deleted contract '${contractName}' from abieos context.`);
         }
       }
       return deleted;
     } catch (e) {
-      throw new Error(`[node-abieos] Failed to delete contract '${contractName}': ${e.message}`);
+      throw new Error(`${_Abieos.logTag} Failed to delete contract '${contractName}': ${e.message}`);
     }
   }
 };

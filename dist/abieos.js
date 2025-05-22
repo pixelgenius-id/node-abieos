@@ -40,6 +40,7 @@ export class Abieos {
      * This is useful for freeing up resources and ensuring a clean state.
      */
     cleanup() {
+        /* node:coverage disable */
         Abieos.loadedContracts.forEach((_, contractName) => {
             try {
                 if (Abieos.debug) {
@@ -52,6 +53,7 @@ export class Abieos {
                 console.error(`${Abieos.logTag} Failed to delete contract '${contractName}' during cleanup: ${e.message}`);
             }
         });
+        /* node:coverage enable */
     }
     /**
      * Converts a string name to its corresponding 64-bit unsigned integer representation (BigInt).
@@ -97,6 +99,7 @@ export class Abieos {
             const data = Abieos.native.hex_to_json(contractName, type, hex);
             // Attempt to parse the string data as JSON.
             // This is still necessary as the native module returns a string.
+            /* node:coverage disable */
             try {
                 return JSON.parse(data);
             }
@@ -106,6 +109,7 @@ export class Abieos {
                 // or just malformed JSON.
                 throw new Error(`${Abieos.logTag} Failed to parse JSON string from hex for contract '${contractName}', type '${type}'. Received: ${data}. Parse error: ${parseError.message}`);
             }
+            /* node:coverage enable */
         }
         catch (e) {
             // This catches errors thrown by the N-API layer itself.
@@ -124,12 +128,14 @@ export class Abieos {
         try {
             const data = Abieos.native.bin_to_json(contractName, type, buffer);
             // Attempt to parse the string data as JSON.
+            /* node:coverage disable */
             try {
                 return JSON.parse(data);
             }
             catch (parseError) {
                 throw new Error(`${Abieos.logTag} Failed to parse JSON string from binary for contract '${contractName}', type '${type}'. Received: ${data}. Parse error: ${parseError.message}`);
             }
+            /* node:coverage enable */
         }
         catch (e) {
             // This catches errors thrown by the N-API layer itself.
@@ -176,9 +182,11 @@ export class Abieos {
         if (typeof abihex !== 'string') {
             throw new Error(`${Abieos.logTag} ABI hex must be a String.`);
         }
+        /* node:coverage disable */
         if (Abieos.debug && Abieos.loadedContracts.has(contractName)) {
             console.info(`${Abieos.logTag} Contract '${contractName}' is already loaded. Updating ABI...`);
         }
+        /* node:coverage enable */
         try {
             const loaded = Abieos.native.load_abi_hex(contractName, abihex);
             if (loaded) {

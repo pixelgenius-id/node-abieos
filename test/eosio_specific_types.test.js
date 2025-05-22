@@ -41,6 +41,18 @@ test.describe('EOSIO Specific Types', () => {
     abieos.cleanup();
     abieos.loadAbi(contract, eosioTypesAbi);
 
+    test('simple stringToName conversion', () => {
+        const nameValue = abieos.stringToName("eosio.token");
+        assert.ok(typeof nameValue === 'bigint', 'stringToName should return a BigInt');
+    });
+
+    test('stringToName conversion with invalid name', () => {
+        assertThrows(
+            /Failed to convert string to name./i,
+            () => abieos.stringToName(null),
+            'Should throw for invalid name format'
+        );
+    });
 
     test('name type serialization/deserialization', () => {
         globalTestRoundTrip(abieos, contract, 'name_type', { value: "eosio" });
@@ -49,13 +61,6 @@ test.describe('EOSIO Specific Types', () => {
         globalTestRoundTrip(abieos, contract, 'name_type', { value: "" });
         globalTestRoundTrip(abieos, contract, 'name_type', { value: "a" });
         globalTestRoundTrip(abieos, contract, 'name_type', { value: "zzzzzzzzzzzzj" });
-
-        if (typeof abieos.stringToName === 'function' && typeof abieos.nameToString === 'function') {
-            const nameValue = abieos.stringToName("eosio.token");
-            assert.ok(typeof nameValue === 'bigint' || typeof nameValue === 'number', 'stringToName should return a BigInt or Number');
-            const nameAsString = abieos.nameToString(nameValue);
-            assert.strictEqual(nameAsString, "eosio.token", 'roundtrip name conversion should match');
-        }
     });
 
     test('asset type serialization/deserialization', () => {

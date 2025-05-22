@@ -40,7 +40,6 @@ export function assertThrows(expectedError, fn, message) {
 export function testRoundTrip(abieos, contract, type, data) {
     const hex = abieos.jsonToHex(contract, type, data);
     assert.ok(typeof hex === 'string' && hex.length > 0, `Serialization should produce hex for ${type}`);
-
     const roundTripped = abieos.hexToJson(contract, type, hex);
     assert.deepStrictEqual(roundTripped, data, `Round-trip conversion should preserve data for ${type}`);
     return hex;
