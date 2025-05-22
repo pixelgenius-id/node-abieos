@@ -44,11 +44,10 @@ const serializationTests = [
 
 const runSerializationTests = () => {
     let sum = 0;
-    serializationTests.forEach((value, index) => {
+    serializationTests.forEach((value) => {
         // seriallize action data
         const tref = process.hrtime.bigint();
         let actionHexData;
-        let actionJsonData;
         const type = abieos.getTypeForAction(value.account, value.name);
         try {
             actionHexData = abieos.jsonToHex(value.account, type, value.data);
@@ -56,8 +55,7 @@ const runSerializationTests = () => {
             if (actionHexData !== value.expects) {
                 console.log(`ERROR - Got: ${actionHexData}, Expected: ${value.expects}`);
             }
-            actionJsonData = abieos.hexToJson(value.account, type, actionHexData);
-            // console.log(actionJsonData);
+            abieos.hexToJson(value.account, type, actionHexData);
         } catch (e) {
             console.log(e);
         }

@@ -1,6 +1,7 @@
 import {Abieos} from "@eosrio/node-abieos";
 import {readFileSync} from "node:fs";
 import {typeTests} from "./tests.mjs";
+import {join} from "node:path";
 
 const ABIs = [
     {code: 'eosio', path: './ABIs/eosio.json'},
@@ -11,7 +12,7 @@ const ABIs = [
 const abieos = Abieos.getInstance();
 
 ABIs.forEach(value => {
-    const data = readFileSync(value.path).toString();
+    const data = readFileSync(join(import.meta.dirname,value.path)).toString();
     console.log(`Loading ${value.code} ABI...`);
     if (value.path.endsWith('raw')) {
         const buffer = Buffer.from(data, 'base64');
@@ -43,11 +44,10 @@ const serializationTests = [
 
 const runSerializationTests = () => {
     let sum = 0;
-    serializationTests.forEach((value, index) => {
+    serializationTests.forEach((value) => {
         // seriallize action data
         const tref = process.hrtime.bigint();
         let actionHexData;
-        let actionJsonData;
         const type = abieos.getTypeForAction(value.account, value.name);
         try {
             actionHexData = abieos.jsonToHex(value.account, type, value.data);
@@ -55,8 +55,7 @@ const runSerializationTests = () => {
             if (actionHexData !== value.expects) {
                 console.log(`ERROR - Got: ${actionHexData}, Expected: ${value.expects}`);
             }
-            actionJsonData = abieos.hexToJson(value.account, type, actionHexData);
-            // console.log(actionJsonData);
+            abieos.hexToJson(value.account, type, actionHexData);
         } catch (e) {
             console.log(e);
         }
