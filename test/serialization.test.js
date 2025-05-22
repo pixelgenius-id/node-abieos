@@ -1,9 +1,10 @@
-import test from 'node:test';
 import assert from 'node:assert/strict';
-import { assertThrows, setupAbieos } from './test-helpers.js';
+import test from 'node:test';
+import { Abieos } from '../dist/abieos.js';
+import { assertThrows } from './utils/test-helpers.js';
 
 test.describe('Serialization (jsonToHex)', () => {
-    let abieos;
+    const abieos = Abieos.getInstance();
 
     const contractAccount = "test.token";
     const transferABI = {
@@ -22,10 +23,10 @@ test.describe('Serialization (jsonToHex)', () => {
         actions: [{ name: "transfer", type: "transfer", ricardian_contract: "" }],
     };
 
-    test.beforeEach(() => {
-        abieos = setupAbieos();
-        abieos.loadAbi(contractAccount, transferABI); 
-    });
+    Abieos.debug = true;
+    abieos.cleanup();
+    abieos.loadAbi(contractAccount, transferABI);
+
 
     test('should serialize valid transfer action data', () => {
         const actionData = {
@@ -41,19 +42,17 @@ test.describe('Serialization (jsonToHex)', () => {
     test('should throw if ABI for contract is not loaded', () => {
         const actionData = { from: "a", to: "b", quantity: "1.0 EOS", memo: "m" };
         assertThrows(
-            () => abieos.jsonToHex("unknown.contract", "transfer", actionData),
-            /failed to parse data/i, // Updated regex
+            /is not loaded/i,
+            () => abieos.jsonToHex("unknown", "transfer", actionData),
             'Should throw if ABI is not loaded'
         );
     });
 
     test('should throw if type is not found in ABI', () => {
         const actionData = { from: "a", to: "b", quantity: "1.0 EOS", memo: "m" };
-        // While setupAbieos.getType might throw a specific error, jsonToHex's C++ part might fail first,
-        // leading to the generic wrapper error.
         assertThrows(
+            /Unknown type/i,
             () => abieos.jsonToHex(contractAccount, "unknown_type", actionData),
-            /failed to parse data/i, // Updated regex
             'Should throw if type is not found'
         );
     });
@@ -65,8 +64,8 @@ test.describe('Serialization (jsonToHex)', () => {
             memo: "test transfer"
         };
         assertThrows(
+            /Expected field/i,
             () => abieos.jsonToHex(contractAccount, "transfer", actionData),
-            /failed to parse data/i, // Updated regex
             'Should throw for missing required fields'
         );
     });
@@ -75,12 +74,12 @@ test.describe('Serialization (jsonToHex)', () => {
         const actionData = {
             from: "alice",
             to: "bob",
-            quantity: 12345, 
+            quantity: 12345,
             memo: "test transfer"
         };
         assertThrows(
+            /Expected symbol code/i,
             () => abieos.jsonToHex(contractAccount, "transfer", actionData),
-            /failed to parse data/i, // Updated regex
             'Should throw for incorrect data types'
         );
     });

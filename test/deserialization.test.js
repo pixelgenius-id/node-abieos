@@ -1,9 +1,9 @@
-import test from 'node:test';
 import assert from 'node:assert/strict';
-import { assertThrows, setupAbieos } from './test-helpers.js';
+import test from 'node:test';
+import { Abieos } from '../dist/abieos.js';
 
 test.describe('Deserialization (hexTojson)', () => {
-    let abieos;
+    const abieos = Abieos.getInstance();
 
     const contractAccount = "test.token";
     const transferABI = {
@@ -27,31 +27,31 @@ test.describe('Deserialization (hexTojson)', () => {
         quantity: "1.0000 EOS",
         memo: "test transfer"
     };
-    let validHex; 
+    let validHex;
 
-    test.beforeEach(() => {
-        abieos = setupAbieos();
-        abieos.loadAbi(contractAccount, transferABI);
-        validHex = abieos.jsonToHex(contractAccount, "transfer", transferActionData);
-    });
+    Abieos.debug = true;
+    abieos.cleanup();
+    abieos.loadAbi(contractAccount, transferABI);
+
+    validHex = abieos.jsonToHex(contractAccount, "transfer", transferActionData);
 
     test('should deserialize valid hex data for transfer action', () => {
-        const jsonData = abieos.hexTojson(contractAccount, "transfer", validHex);
+        const jsonData = abieos.hexToJson(contractAccount, "transfer", validHex);
         assert.deepStrictEqual(jsonData, transferActionData, 'Deserialized data should match original');
     });
 
     test('should throw if ABI for contract is not loaded during deserialization', () => {
         assert.throws(
-            () => abieos.hexTojson("unknown.contract", "transfer", validHex),
-            /Native error when converting hex to JSON.*binary decode error|Native error when converting hex to JSON.*contract.*not loaded|Native error when converting hex to JSON.*unknown contract/i,
+            () => abieos.hexToJson("unknown.contract", "transfer", validHex),
+            (err) => err.message.includes('binary decode error'),
             'Should throw if ABI is not loaded for deserialization'
         );
     });
 
     test('should throw if type is not found in ABI during deserialization', () => {
         assert.throws(
-            () => abieos.hexTojson(contractAccount, "unknown_type", validHex),
-            /Native error when converting hex to JSON.*Unknown type/i,
+            () => abieos.hexToJson(contractAccount, "unknown_type", validHex),
+            (err) => err.message.includes('Unknown type'),
             'Should throw if type is not found for deserialization'
         );
     });
@@ -59,18 +59,37 @@ test.describe('Deserialization (hexTojson)', () => {
     test('should throw for invalid hex string', () => {
         const invalidHex = "thisisnothex";
         assert.throws(
-            () => abieos.hexTojson(contractAccount, "transfer", invalidHex),
-            /Native error when converting hex to JSON.*expected hex string/i,
+            () => abieos.hexToJson(contractAccount, "transfer", invalidHex),
+            (err) => err.message.includes('expected hex string'),
             'Should throw for invalid hex string'
         );
     });
 
     test('should throw for hex string that does not conform to ABI type', () => {
-        const shortHex = "1234"; 
+        const shortHex = "1234";
         assert.throws(
-            () => abieos.hexTojson(contractAccount, "transfer", shortHex),
-            /Native error when converting hex to JSON.*Stream overrun/i,
+            () => abieos.hexToJson(contractAccount, "transfer", shortHex),
+            (err) => err.message.includes('Stream overrun'),
             'Should throw for malformed hex data'
         );
     });
+
+    test('binToJson should throw for invalid hex string', () => {
+        const invalidHex = "thisisnothex";
+        assert.throws(
+            () => abieos.binToJson(contractAccount, "transfer", invalidHex),
+            (err) => err.message.includes('Expected two string arguments and one buffer'),
+            'Should throw for invalid hex string'
+        );
+    });
+
+    test('binToJson should throw for valid Buffer that does not conform to the type', () => {
+        const shortHex = "1234";
+        assert.throws(
+            () => abieos.binToJson(contractAccount, "transfer", Buffer.from(shortHex, 'hex')),
+            (err) => err.message.includes('Stream overrun'),
+            'Should throw for malformed hex data'
+        );
+    });
+
 });

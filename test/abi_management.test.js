@@ -1,16 +1,20 @@
-import test from 'node:test';
 import assert from 'node:assert/strict';
-import { assertThrows, setupAbieos } from './test-helpers.js';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import test from 'node:test';
+import { Abieos } from '../dist/abieos.js';
+import { assertThrows } from './utils/test-helpers.js';
 
 test.describe('ABI Management', () => {
     let abieos;
 
+    Abieos.debug = true;
+
     test.beforeEach(() => {
-        abieos = setupAbieos();
+        abieos = Abieos.getInstance();
+        abieos.cleanup();
     });
 
-    // Note: The inner 'test.describe' from the original file becomes the main content here.
-    // Constants like simpleABI and contractAccount are relevant to these tests.
     const simpleABI = {
         version: "eosio::abi/1.1",
         types: [{ new_type_name: "account_name", type: "name" }],
@@ -31,6 +35,10 @@ test.describe('ABI Management', () => {
     };
     const contractAccount = "eosio.token";
 
+    const path = join(import.meta.dirname, 'utils', 'eosio.token.raw');
+    const rawAbi = readFileSync(path).toString();
+    const eosioTokenAbiBuffer = Buffer.from(rawAbi, 'base64');
+
     test('should load an ABI for a contract', () => {
         const result = abieos.loadAbi(contractAccount, simpleABI);
         assert.ok(result, 'loadAbi should return true on success');
@@ -38,10 +46,10 @@ test.describe('ABI Management', () => {
         assert.ok(loadedAbis.includes(contractAccount), 'Contract ABI should be in loaded ABIs');
     });
 
-    test('should return false when loading an already loaded ABI for the same contract', () => {
-        abieos.loadAbi(contractAccount, simpleABI); // First load
-        const result = abieos.loadAbi(contractAccount, simpleABI); // Attempt to load again
-        assert.strictEqual(result, false, 'loadAbi should return false for an already loaded ABI');
+    test('should be able load the ABI for a contract that was already loaded, updating it', () => {
+        abieos.loadAbi(contractAccount, simpleABI);
+        const result = abieos.loadAbi(contractAccount, simpleABI);
+        assert.strictEqual(result, true, 'loadAbi should return true for an already loaded ABI');
     });
 
     test('should throw an error when loading an invalid ABI structure (e.g. non-object ABI)', () => {
@@ -57,8 +65,8 @@ test.describe('ABI Management', () => {
     test('should throw an error when loading an ABI with invalid fields (e.g. structs not an array)', () => {
         const invalidABI = { version: "eosio::abi/1.1", structs: "not an array" };
         assertThrows(
-            () => abieos.loadAbi("testcontract.invalid", invalidABI),
             /Failed to load ABI|Invalid ABI structure/i,
+            () => abieos.loadAbi("testcontract.invalid", invalidABI),
             'Should throw for ABI with invalid field types'
         );
     });
@@ -69,7 +77,7 @@ test.describe('ABI Management', () => {
             version: "eosio::abi/1.1",
             types: [],
             structs: [{
-                name: "transfer", // Changed name to avoid conflict if ABI content matters for loading
+                name: "transfer",
                 base: "",
                 fields: [
                     { name: "from", type: "name" },
@@ -88,8 +96,103 @@ test.describe('ABI Management', () => {
 
     test('should clear all loaded ABIs', () => {
         abieos.loadAbi(contractAccount, simpleABI);
-        abieos.clearLoadedAbis();
+        abieos.cleanup();
         const loadedAbis = abieos.getLoadedAbis();
         assert.strictEqual(loadedAbis.length, 0, 'clearLoadedAbis should remove all ABIs');
     });
+
+    test('cleanup should throw if an invalid contract name is found in the contracts map', () => {
+        abieos.loadAbi(contractAccount, simpleABI);
+        // Simulate an invalid contract name by directly manipulating the loadedContracts map
+        Abieos.loadedContracts.set(0, Date.now());
+        assertThrows(
+            /Errors during cleanup/i,
+            () => abieos.cleanup(),
+            'cleanup should throw for invalid contract names'
+        );
+        // Clean up the invalid contract name
+        Abieos.loadedContracts.delete(0);
+    });
+
+    test('cleanup should not throw if no contract was loaded', () => {
+        assert.doesNotThrow(() => {
+            abieos.cleanup();
+        }, 'cleanup should not throw if no contract was loaded');
+    });
+
+    test('loadAbi should throw if the abi data is not an object or string', () => {
+        assertThrows(
+            /ABI must be a String or Object/i,
+            () => abieos.loadAbi(contractAccount, 123),
+            'loadAbi should throw for non-object or non-string ABI data'
+        );
+    });
+
+    test('loadAbiHex should throw if the abi data is not a hex string', () => {
+        assertThrows(
+            /expected hex string/i,
+            () => abieos.loadAbiHex(contractAccount, "not a hex string"),
+            'loadAbiHex should throw for non-hex string ABI data'
+        );
+    });
+
+    test('loadAbiHex should throw if the ABI is not a string', () => {
+        assertThrows(
+            /ABI hex must be a String/i,
+            () => abieos.loadAbiHex(contractAccount, 123),
+            'loadAbiHex should throw for invalid ABI hex string'
+        );
+    });
+
+    test('loadAbiHex should save the ABI in the loaded contracts map', () => {
+        abieos.loadAbiHex(contractAccount, eosioTokenAbiBuffer.toString('hex'));
+        const loadedAbis = abieos.getLoadedAbis();
+        assert.ok(loadedAbis.includes(contractAccount), 'Contract ABI should be in loaded ABIs');
+    });
+
+    test('getTypeForAction should return the correct type for a given action', () => {
+        abieos.loadAbi(contractAccount, simpleABI);
+        const actionType = abieos.getTypeForAction(contractAccount, "transfer");
+        assert.strictEqual(actionType, "transfer", 'getTypeForAction should return the correct type for the action');
+    });
+
+    test('getTypeForAction should throw if the action is not found in the ABI', () => {
+        abieos.loadAbi(contractAccount, simpleABI);
+        assertThrows(
+            /Failed to get type for action/i,
+            () => abieos.getTypeForAction(contractAccount, "non_existent_action"),
+            'getTypeForAction should throw if action is not found'
+        );
+    });
+
+    test('getTypeForTable should return the correct type for a given table', () => {
+        abieos.loadAbiHex(contractAccount, eosioTokenAbiBuffer.toString('hex'));
+        const tableType = abieos.getTypeForTable(contractAccount, "accounts");
+        assert.strictEqual(tableType, "account", 'getTypeForTable should return the correct type for the table');
+    });
+
+    test('getTypeForTable should throw if the table is not found in the ABI', () => {
+        abieos.loadAbiHex(contractAccount, eosioTokenAbiBuffer.toString('hex'));
+        assertThrows(
+            /Failed to get type for table/i,
+            () => abieos.getTypeForTable(contractAccount, "non_existent_table"),
+            'getTypeForTable should throw if table is not found'
+        );
+    });
+
+    test('deleteContract should remove the contract from loaded contracts', () => {
+        abieos.loadAbi(contractAccount, simpleABI);
+        abieos.deleteContract(contractAccount);
+        const loadedAbis = abieos.getLoadedAbis();
+        assert.ok(!loadedAbis.includes(contractAccount), 'Contract ABI should be removed from loaded ABIs');
+    });
+
+    test('deleteContract should throw with invalid arguments', () => {
+        assertThrows(
+            /Expected one string argument/i,
+            () => abieos.deleteContract(123),
+            'deleteContract should throw for invalid contract name'
+        );
+    });
+
 });

@@ -6,8 +6,8 @@
 
 Node.js native binding for [abieos](https://github.com/AntelopeIO/abieos), with some improvements:
 
-- Contracts can be directly updated on the map
-- Added `abieos_delete_contract`
+- Internal loaded contract map
+- deleteContract: to remove the loaded contract from memory (now in vanilla abieos too)
 
 Made with ♥ by [EOS Rio](https://eosrio.io/)
 
@@ -57,3 +57,9 @@ npm install
 npm run build:linux
 npm run build
 ```
+
+### Documentation
+
+For detailed and user-friendly documentation, including installation, usage, API reference, error handling, debugging, and examples, please refer to the [documentation](docs/README.md).
+
+For contribution guidelines and developer documentation, refer to the [contribution guidelines](docs/CONTRIBUTING.md).

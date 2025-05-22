@@ -1,6 +1,10 @@
 {
   "name": "@eosrio/node-abieos",
-  "version": "4.0.0-2039717",
+  "version": "4.0.1-2039717",
+  "publishConfig": {
+    "access": "public",
+    "tag": "abieos"
+  },
   "description": "Node Bindings for abieos: Binary <> JSON conversion using ABIs.",
   "main": "./dist/abieos.js",
   "types": "./dist/abieos.d.ts",
@@ -14,17 +18,16 @@
   },
   "scripts": {
     "install": "node -e 'process.exit(0)'",
+    "build:linux": "cmake-js compile && node scripts/copy-module.mjs",
+    "build": "tsup",
     "test": "node --test test/**/*.test.js",
-    "test:examples": "cd examples && node basic.mjs",
     "test:coverage": "node --test --experimental-test-coverage test/**/*.test.js",
-    "test:watch": "node --test --watch test/**/*.test.js",
+    "test:watch": "node --test --watch --experimental-test-coverage test/**/*.test.js",
     "tsc:watch": "tsc --watch",
     "clean": "cmake-js clean",
-    "build": "tsup",
-    "build:linux": "cmake-js compile --cc /usr/bin/clang-18 --cxx /usr/bin/clang++-18 && cp build/Release/node_abieos.node lib/abieos.node",
-    "build:linux:ci": "cmake-js compile && cp build/Release/node_abieos.node lib/abieos.node",
     "build:win": "cmake-js",
-    "update_version": "node update-version.mjs"
+    "build:mac": "cmake-js",
+    "update_version": "node scripts/update-version.mjs"
   },
   "repository": {
     "type": "git",
