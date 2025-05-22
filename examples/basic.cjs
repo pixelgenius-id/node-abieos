@@ -1,5 +1,6 @@
 const {Abieos} = require('@eosrio/node-abieos');
 const {readFileSync} = require('node:fs');
+const {join} = require('node:path');
 const {typeTests} = require('./tests.cjs');
 
 const ABIs = [
@@ -10,10 +11,8 @@ const ABIs = [
 
 const abieos = Abieos.getInstance();
 
-console.log(abieos);
-
 ABIs.forEach(value => {
-    const data = readFileSync(value.path).toString();
+    const data = readFileSync(join(__dirname, value.path)).toString();
     console.log(`Loading ${value.code} ABI...`);
     if (value.path.endsWith('raw')) {
         const buffer = Buffer.from(data, 'base64');
