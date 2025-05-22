@@ -1,19 +1,21 @@
-import {Abieos} from "@eosrio/node-abieos";
-import {readFileSync} from "node:fs";
-import {join} from "node:path";
+// Deno version of the example
+import { Abieos } from "npm:@eosrio/node-abieos";
+
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { Buffer } from "node:buffer"
-import {typeTests} from "./tests.mjs";
+import { typeTests } from "../tests.mjs";
 
 const ABIs = [
-    {code: 'eosio', path: './ABIs/eosio.json'},
-    {code: 'eosio.msig', path: './ABIs/eosio.msig.json'},
-    {code: 'eosio.token', path: './ABIs/eosio.token.raw'}
+    { code: 'eosio', path: '../ABIs/eosio.json' },
+    { code: 'eosio.msig', path: '../ABIs/eosio.msig.json' },
+    { code: 'eosio.token', path: '../ABIs/eosio.token.raw' }
 ];
 
 const abieos = Abieos.getInstance();
 
 ABIs.forEach(value => {
-    const data = readFileSync(join(import.meta.dirname,value.path)).toString();
+    const data = readFileSync(value.path).toString();
     console.log(`Loading ${value.code} ABI...`);
     if (value.path.endsWith('raw')) {
         const buffer = Buffer.from(data, 'base64');

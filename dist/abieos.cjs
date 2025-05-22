@@ -29,8 +29,8 @@ var getImportMetaUrl = () => typeof document === "undefined" ? new URL(`file:${_
 var importMetaUrl = /* @__PURE__ */ getImportMetaUrl();
 
 // lib/abieos.ts
-var import_module = require("module");
-var abieos = (0, import_module.createRequire)(importMetaUrl)("./abieos.node");
+var import_node_module = require("module");
+var abieos = (0, import_node_module.createRequire)(importMetaUrl)("./abieos.node");
 var Abieos = class _Abieos {
   static logTag = "[node-abieos]";
   static instance;
