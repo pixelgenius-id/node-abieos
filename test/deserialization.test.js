@@ -43,7 +43,7 @@ test.describe('Deserialization (hexTojson)', () => {
     test('should throw if ABI for contract is not loaded during deserialization', () => {
         assert.throws(
             () => abieos.hexToJson("unknown.contract", "transfer", validHex),
-            (err) => err.message.includes('binary decode error') || err.message.includes('failed to parse'),
+            (err) => err.message.includes('binary decode error'),
             'Should throw if ABI is not loaded for deserialization'
         );
     });
@@ -51,7 +51,7 @@ test.describe('Deserialization (hexTojson)', () => {
     test('should throw if type is not found in ABI during deserialization', () => {
         assert.throws(
             () => abieos.hexToJson(contractAccount, "unknown_type", validHex),
-            (err) => err.message.includes('Unknown type') || err.message.includes('failed to parse'),
+            (err) => err.message.includes('Unknown type'),
             'Should throw if type is not found for deserialization'
         );
     });
@@ -60,7 +60,7 @@ test.describe('Deserialization (hexTojson)', () => {
         const invalidHex = "thisisnothex";
         assert.throws(
             () => abieos.hexToJson(contractAccount, "transfer", invalidHex),
-            (err) => err.message.includes('expected hex string') || err.message.includes('failed to parse'),
+            (err) => err.message.includes('expected hex string'),
             'Should throw for invalid hex string'
         );
     });
@@ -69,7 +69,7 @@ test.describe('Deserialization (hexTojson)', () => {
         const shortHex = "1234";
         assert.throws(
             () => abieos.hexToJson(contractAccount, "transfer", shortHex),
-            (err) => err.message.includes('Stream overrun') || err.message.includes('failed to parse'),
+            (err) => err.message.includes('Stream overrun'),
             'Should throw for malformed hex data'
         );
     });
