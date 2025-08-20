@@ -1,11 +1,11 @@
-const {Abieos} = require('@eosrio/node-abieos');
+const {Abieos} = require('@pixelgeniusid/node-abieos');
 const {readFileSync} = require('node:fs');
 const {typeTests} = require('./tests.cjs');
 
 const ABIs = [
-    {code: 'eosio', path: './ABIs/eosio.json'},
-    {code: 'eosio.msig', path: './ABIs/eosio.msig.json'},
-    {code: 'eosio.token', path: './ABIs/eosio.token.raw'}
+    {code: 'vexcore', path: './ABIs/eosio.json'},
+    {code: 'vex.msig', path: './ABIs/eosio.msig.json'},
+    {code: 'vex.token', path: './ABIs/eosio.token.raw'}
 ];
 
 const abieos = Abieos.getInstance();
@@ -28,11 +28,11 @@ ABIs.forEach(value => {
 typeTests(abieos);
 
 // stringToName
-console.log('stringToName: eosio -->', abieos.stringToName('eosio'));
+console.log('stringToName: vexcore -->', abieos.stringToName('vexcore'));
 
 const serializationTests = [
     {
-        account: 'eosio',
+        account: 'vexcore',
         name: 'voteproducer',
         data: {
             voter: "voteracct111",
@@ -76,7 +76,7 @@ for (let i = 0; i < totalRuns; i++) {
 console.log(`Average execution (getTypeForAction + jsonToHex + hexToJson): ${sum / totalRuns} us on ${totalRuns} runs`);
 
 // delete contract from cache, returns true or false
-const status = abieos.deleteContract("eosio");
+const status = abieos.deleteContract("vexcore");
 if (status) {
     console.log('OK - contract deleted');
 } else {
@@ -85,7 +85,7 @@ if (status) {
 
 // check whether the contract was deleted
 try {
-    abieos.getTypeForAction("eosio", "voteproducer");
+    abieos.getTypeForAction("vexcore", "voteproducer");
 } catch (e) {
     console.log('OK - Contract context removal confirmed');
 }

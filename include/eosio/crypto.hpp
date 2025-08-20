@@ -18,7 +18,7 @@ namespace eosio {
  */
 
 /**
- *  EOSIO ECC public key data
+ *  VEX ECC public key data
  *
  *  Fixed size representation of either a K1 or R1 compressed public key
 
@@ -27,7 +27,7 @@ namespace eosio {
 using ecc_public_key = std::array<char, 33>;
 
 /**
- *  EOSIO WebAuthN public key
+ *  VEX WebAuthN public key
  *
  *  @ingroup public_key
  */
@@ -59,7 +59,7 @@ EOSIO_REFLECT(webauthn_public_key, key, user_presence, rpid);
 EOSIO_COMPARE(webauthn_public_key);
 
 /**
- *  EOSIO Public Key
+ *  VEX Public Key
  *
  *  A public key is a variant of
  *   0 : a ECC K1 public key
@@ -74,7 +74,7 @@ using ecc_private_key = std::array<char, 32>;
 using private_key     = std::variant<ecc_private_key, ecc_private_key>;
 
 /**
- *  EOSIO ECC signature data
+ *  VEX ECC signature data
  *
  *  Fixed size representation of either a K1 or R1 ECC compact signature
 

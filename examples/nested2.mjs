@@ -1,12 +1,12 @@
-import {Abieos} from "@eosrio/node-abieos";
+import {Abieos} from "@pixelgeniusid/node-abieos";
 import {ABI, Serializer} from "@wharfkit/antelope";
 
 const abieos = Abieos.getInstance();
 
-const eosioNftFt = await fetch("https://ultra.eosrio.io/v1/chain/get_abi",{
+const eosioNftFt = await fetch("https://ultra.pixelgeniusid.id/v1/chain/get_abi",{
     method: "POST",
     body: JSON.stringify({
-        account_name: "eosio.nft.ft",
+        account_name: "vex.nft.ft",
         json: true
     })
 });
@@ -14,7 +14,7 @@ const eosioNftFt = await fetch("https://ultra.eosrio.io/v1/chain/get_abi",{
 const abiData = JSON.stringify((await eosioNftFt.json()).abi);
 
 // loading ABI
-const status = abieos.loadAbi('eosio.nft.ft', abiData);
+const status = abieos.loadAbi('vex.nft.ft', abiData);
 
 process.exit();
 

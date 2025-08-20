@@ -32,7 +32,7 @@ test.describe('Serialization (jsonToHex)', () => {
         const actionData = {
             from: "alice",
             to: "bob",
-            quantity: "1.0000 EOS",
+            quantity: "1.0000 VEX",
             memo: "test transfer"
         };
         const hex = abieos.jsonToHex(contractAccount, "transfer", actionData);
@@ -40,7 +40,7 @@ test.describe('Serialization (jsonToHex)', () => {
     });
 
     test('should throw if ABI for contract is not loaded', () => {
-        const actionData = { from: "a", to: "b", quantity: "1.0 EOS", memo: "m" };
+        const actionData = { from: "a", to: "b", quantity: "1.0 VEX", memo: "m" };
         assertThrows(
             /is not loaded/i,
             () => abieos.jsonToHex("unknown", "transfer", actionData),
@@ -49,7 +49,7 @@ test.describe('Serialization (jsonToHex)', () => {
     });
 
     test('should throw if type is not found in ABI', () => {
-        const actionData = { from: "a", to: "b", quantity: "1.0 EOS", memo: "m" };
+        const actionData = { from: "a", to: "b", quantity: "1.0 VEX", memo: "m" };
         assertThrows(
             /Unknown type/i,
             () => abieos.jsonToHex(contractAccount, "unknown_type", actionData),
@@ -60,7 +60,7 @@ test.describe('Serialization (jsonToHex)', () => {
     test('should throw for data with missing required fields', () => {
         const actionData = {
             from: "alice",
-            quantity: "1.0000 EOS",
+            quantity: "1.0000 VEX",
             memo: "test transfer"
         };
         assertThrows(
