@@ -6,7 +6,7 @@ import { assertThrows, testRoundTrip as globalTestRoundTrip } from './utils/test
 test.describe('EOSIO Specific Types', () => {
     const abieos = Abieos.getInstance();
 
-    const contract = 'eosio.types';
+    const contract = 'vex.types';
     const eosioTypesAbi = {
         version: 'eosio::abi/1.1',
         types: [],
