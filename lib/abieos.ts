@@ -1,4 +1,4 @@
-import { createRequire } from "module";
+import { createRequire } from "node:module";
 const abieos = createRequire(import.meta.url)('./abieos.node');
 
 /**

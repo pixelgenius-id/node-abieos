@@ -1,19 +1,21 @@
-import {Abieos} from "@pixelgeniusid/node-abieos";
-import {readFileSync} from "node:fs";
-import {join} from "node:path";
+// Deno version of the example
+import { Abieos } from "npm:@eosrio/node-abieos";
+
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { Buffer } from "node:buffer"
-import {typeTests} from "./tests.mjs";
+import { typeTests } from "../tests.mjs";
 
 const ABIs = [
-    {code: 'vexcore', path: './ABIs/eosio.json'},
-    {code: 'vex.msig', path: './ABIs/eosio.msig.json'},
-    {code: 'vex.token', path: './ABIs/eosio.token.raw'}
+    { code: 'eosio', path: '../ABIs/eosio.json' },
+    { code: 'eosio.msig', path: '../ABIs/eosio.msig.json' },
+    { code: 'eosio.token', path: '../ABIs/eosio.token.raw' }
 ];
 
 const abieos = Abieos.getInstance();
 
 ABIs.forEach(value => {
-    const data = readFileSync(join(import.meta.dirname,value.path)).toString();
+    const data = readFileSync(value.path).toString();
     console.log(`Loading ${value.code} ABI...`);
     if (value.path.endsWith('raw')) {
         const buffer = Buffer.from(data, 'base64');
@@ -28,11 +30,11 @@ ABIs.forEach(value => {
 typeTests(abieos);
 
 // stringToName
-console.log('stringToName: vexcore -->', abieos.stringToName('vexcore'));
+console.log('stringToName: eosio -->', abieos.stringToName('eosio'));
 
 const serializationTests = [
     {
-        account: 'vexcore',
+        account: 'eosio',
         name: 'voteproducer',
         data: {
             voter: "voteracct111",
@@ -74,7 +76,7 @@ for (let i = 0; i < totalRuns; i++) {
 console.log(`Average execution (getTypeForAction + jsonToHex + hexToJson): ${sum / totalRuns} us on ${totalRuns} runs`);
 
 // delete contract from cache, returns true or false
-const status = abieos.deleteContract("vexcore");
+const status = abieos.deleteContract("eosio");
 if (status) {
     console.log('OK - contract deleted');
 } else {
@@ -83,7 +85,7 @@ if (status) {
 
 // check whether the contract was deleted
 try {
-    abieos.getTypeForAction("vexcore", "voteproducer");
+    abieos.getTypeForAction("eosio", "voteproducer");
 } catch (e) {
     console.log('OK - Contract context removal confirmed');
 }
