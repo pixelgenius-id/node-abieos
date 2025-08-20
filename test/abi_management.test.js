@@ -33,7 +33,7 @@ test.describe('ABI Management', () => {
         variants: [],
         abi_extensions: [],
     };
-    const contractAccount = "eosio.token";
+    const contractAccount = "vex.token";
 
     const path = join(import.meta.dirname, 'utils', 'eosio.token.raw');
     const rawAbi = readFileSync(path).toString();

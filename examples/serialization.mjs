@@ -1,11 +1,11 @@
-import { Abieos } from "@eosrio/node-abieos";
+import { Abieos } from "@pixelgeniusid/node-abieos";
 
 // Create an instance of Abieos
 const abieos = Abieos.getInstance();
 
 // Fetch the ABI from the blockchain API
 async function fetchAbi(contractName) {
-    const response = await fetch("https://api.eosrio.io/v1/chain/get_abi", {
+    const response = await fetch("https://api.pixelgenius.id/v1/chain/get_abi", {
         method: "POST",
         body: JSON.stringify({ account_name: contractName }),
         headers: { "Content-Type": "application/json" }
@@ -24,13 +24,13 @@ async function loadAbiFromBlockchain(contractName) {
 const json = {
     from: "alice",
     to: "bob",
-    quantity: "10.0000 EOS",
+    quantity: "10.0000 VEX",
     memo: "Test transfer"
 };
 
 // Main function to demonstrate the usage
 async function main() {
-    const contractName = "eosio.token";
+    const contractName = "vex.token";
     await loadAbiFromBlockchain(contractName);
 
     // Convert JSON to hex

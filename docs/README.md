@@ -1,134 +1,215 @@
-# node-abieos Documentation
+# **node-abieos (Vexanium Edition)**
 
-## Overview
+  
 
-`node-abieos` is a Node.js native binding for [abieos](https://github.com/AntelopeIO/abieos), providing binary to JSON conversion using ABIs. This documentation provides detailed information on installation, usage, API reference, error handling, debugging, and examples.
+## **Overview**
 
-## Installation
+  
 
-To install `node-abieos`, use the following command:
+node-abieos  is a Node.js native binding for  [abieos](https://github.com/AntelopeIO/abieos), providing binary ↔ JSON conversion using ABIs.
 
-```shell
-npm i @eosrio/node-abieos --save
+  
+
+This fork is maintained by  [pixelgenius-id](https://github.com/pixelgenius-id)  and has been  **adapted to support the Vexanium Blockchain**.
+
+  
+
+Originally based on  [eosrio/node-abieos](https://github.com/eosrio/node-abieos).
+
+----------
+
+## **Installation**
+
+  
+
+Install from npm:
+
+```
+npm i @pixelgeniusid/node-abieos --save
 ```
 
-## Usage
+----------
 
-### CommonJS
+## **Usage**
 
-```js
-const nodeAbieos = require('@eosrio/node-abieos');
+  
+
+### **CommonJS**
+
+```
+const nodeAbieos = require('@pixelgeniusid/node-abieos');
 ```
 
-### ES Modules
+### **ES Modules / TypeScript**
 
-```typescript
-import { Abieos } from "@eosrio/node-abieos";
+```
+import { Abieos } from "@pixelgeniusid/node-abieos";
 const abieos = Abieos.getInstance();
 ```
 
-## API Reference
+----------
 
-### Abieos Class
+## **API Reference**
 
-The `Abieos` class provides a singleton instance for interacting with the native abieos module. This pattern ensures a single global context for the underlying C++ abieos library, which manages internal state and resources.
+  
 
-#### Methods
+### **Abieos**
 
-- **getInstance()**: Returns the singleton instance of the `Abieos` class.
-- **getLoadedAbis()**: Returns an array of loaded ABI contract names.
-- **cleanup()**: Cleans up all loaded contracts by deleting them from the native context.
-- **stringToName(nameString: string)**: Converts a string name to its corresponding 64-bit unsigned integer representation (BigInt).
-- **jsonToHex(contractName: string, type: string, json: string | object)**: Converts a JSON string or object to its hexadecimal binary representation.
-- **hexToJson(contractName: string, type: string, hex: string)**: Converts a hexadecimal binary string to its JSON representation.
-- **binToJson(contractName: string, type: string, buffer: Buffer)**: Converts a binary buffer to its JSON representation.
-- **loadAbi(contractName: string, abi: string | object)**: Loads an ABI for a given contract.
-- **loadAbiHex(contractName: string, abihex: string)**: Loads an ABI for a given contract from its hexadecimal representation.
-- **getTypeForAction(contractName: string, actionName: string)**: Retrieves the type name for a specific action within a contract's ABI.
-- **getTypeForTable(contractName: string, table_name: string)**: Retrieves the type name for a specific table within a contract's ABI.
-- **deleteContract(contractName: string)**: Deletes a contract's ABI from the abieos context.
+### **Class**
 
-## Error Handling
+  
 
-Errors in `node-abieos` are thrown as JavaScript exceptions. Each method that interacts with the native abieos module includes error handling to provide meaningful error messages.
+A singleton class for interacting with the native  abieos  module.
 
-## Debugging
+This ensures a single global context for the underlying C++ library.
 
-To enable debugging, set the `Abieos.debug` property to `true`. This will log additional information to the console.
+  
 
-```typescript
+#### **Methods**
+
+-   **getInstance()**  → Returns the singleton instance.
+    
+-   **getLoadedAbis()**  → Returns an array of loaded contract ABIs.
+    
+-   **cleanup()**  → Clears all loaded ABIs from the context.
+    
+-   **stringToName(name: string)**  → Converts a string to its 64-bit  name  representation.
+    
+-   **jsonToHex(contract, type, json)** → Converts JSON → Hex.
+    
+-   **hexToJson(contract, type, hex)** → Converts Hex → JSON.
+    
+-   **binToJson(contract, type, buffer)** → Converts binary → JSON.
+    
+-   **loadAbi(contract, abi)**  → Loads an ABI from JSON.
+    
+-   **loadAbiHex(contract, abihex)** → Loads an ABI from Hex.
+    
+-   **getTypeForAction(contract, action)**  → Gets the type for a contract action.
+    
+-   **getTypeForTable(contract, table)**  → Gets the type for a contract table.
+    
+-   **deleteContract(contract)**  → Deletes a loaded contract ABI.
+    
+
+----------
+
+## **Error Handling**
+
+  
+
+Errors are thrown as JavaScript exceptions with descriptive messages when the native module encounters issues.
+
+----------
+
+## **Debugging**
+
+  
+
+Enable debug logging:
+
+```
 Abieos.debug = true;
 ```
 
-## Examples
+----------
 
-### Basic Example
+## **Examples**
 
-```typescript
-import { Abieos } from "@eosrio/node-abieos";
+  
+
+### **Basic Example**
+
+```
+import { Abieos } from "@pixelgeniusid/node-abieos";
+
 const abieos = Abieos.getInstance();
 
 const abi = {
-    "version": "eosio::abi/1.1",
-    "structs": [
-        {
-            "name": "transfer",
-            "base": "",
-            "fields": [
-                {"name": "from", "type": "name"},
-                {"name": "to", "type": "name"},
-                {"name": "quantity", "type": "asset"},
-                {"name": "memo", "type": "string"}
-            ]
-        }
-    ],
-    "actions": [
-        {
-            "name": "transfer",
-            "type": "transfer",
-            "ricardian_contract": ""
-        }
-    ]
+  version: "eosio::abi/1.1",
+  structs: [
+    {
+      name: "transfer",
+      base: "",
+      fields: [
+        { name: "from", type: "name" },
+        { name: "to", type: "name" },
+        { name: "quantity", type: "asset" },
+        { name: "memo", type: "string" }
+      ]
+    }
+  ],
+  actions: [
+    {
+      name: "transfer",
+      type: "transfer",
+      ricardian_contract: ""
+    }
+  ]
 };
 
-abieos.loadAbi("eosio.token", abi);
+abieos.loadAbi("vex.token", abi);
 
 const json = {
-    from: "alice",
-    to: "bob",
-    quantity: "10.0000 EOS",
-    memo: "Test transfer"
+  from: "alice",
+  to: "bob",
+  quantity: "10.0000 VEX",
+  memo: "Test transfer"
 };
 
-const hex = abieos.jsonToHex("eosio.token", "transfer", json);
+const hex = abieos.jsonToHex("vex.token", "transfer", json);
 console.log("Hex:", hex);
 
-const parsedJson = abieos.hexToJson("eosio.token", "transfer", hex);
-console.log("Parsed JSON:", parsedJson);
+const parsed = abieos.hexToJson("vex.token", "transfer", hex);
+console.log("Parsed JSON:", parsed);
 ```
 
-Check the [/examples](https://github.com/eosrio/node-abieos/tree/master/examples) folder for more implementation examples.
+> For more, check the  [/examples](examples)  folder.
 
-## Build Process and Dependencies
+----------
 
-Make sure you have Clang installed on your system. We recommend using Clang 18 to build the `abieos` C++ library.
+## **Build Process**
 
-```bash
+  
+
+Make sure you have **Clang (v18 recommended)**:
+
+```
 wget https://apt.llvm.org/llvm.sh
 chmod +x llvm.sh
 sudo ./llvm.sh 18
 ```
 
-Clone and Build
+### **Clone & Build**
 
-```shell
-git clone https://github.com/eosrio/node-abieos.git --recursive
+```
+git clone https://github.com/pixelgenius-id/node-abieos.git --recursive
 cd node-abieos
 npm install
 npm run build:linux
 npm run build
 ```
 
-## Contribution Guidelines
+----------
 
-For contribution guidelines and developer documentation, refer to the `docs/CONTRIBUTING.md` file.
+## **Contributing**
+
+  
+
+See the  [CONTRIBUTING.md](docs/CONTRIBUTING.md)  guide for details.
+
+----------
+
+## **License**
+
+  
+
+Licensed under the  [MIT License](LICENSE).
+
+----------
+
+## **Attribution**
+
+  
+
+This project is  **originally based on**  [eosrio/node-abieos](https://github.com/eosrio/node-abieos)  and adapted by  [pixelgenius-id](https://github.com/pixelgenius-id)  to support the  **Vexanium Blockchain**.

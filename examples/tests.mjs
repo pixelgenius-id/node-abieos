@@ -1,12 +1,12 @@
 export function typeTests(abieos) {
 
     const typeTests = [
-        {type: 'action', code: 'eosio', name: 'voteproducer', expects: 'voteproducer'},
-        {type: 'action', code: 'eosio.token', name: 'transfer', expects: 'transfer'},
-        {type: 'table', code: 'eosio', name: 'producers', expects: 'producer_info'},
-        {type: 'table', code: 'eosio.token', name: 'stat', expects: 'currency_stats'},
-        {type: 'table', code: 'eosio.msig', name: 'approvals2', expects: 'approvals_info'},
-        {type: 'table', code: 'eosio.msig', name: 'proposal', expects: 'proposal'},
+        {type: 'action', code: 'vexcore', name: 'voteproducer', expects: 'voteproducer'},
+        {type: 'action', code: 'vex.token', name: 'transfer', expects: 'transfer'},
+        {type: 'table', code: 'vexcore', name: 'producers', expects: 'producer_info'},
+        {type: 'table', code: 'vex.token', name: 'stat', expects: 'currency_stats'},
+        {type: 'table', code: 'vex.msig', name: 'approvals2', expects: 'approvals_info'},
+        {type: 'table', code: 'vex.msig', name: 'proposal', expects: 'proposal'},
         {type: 'table', code: '2', name: 'null', expects: ''},
     ];
 
