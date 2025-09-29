@@ -15,12 +15,25 @@ jobs:
     strategy:
       matrix:
         node-version: [22.x, 24.x]
+      fail-fast: false
 
     steps:
     # Checkout repo and submodules
-    - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
       with:
         submodules: recursive
+
+    # Cache CMake build files
+    - name: Cache CMake build
+      uses: actions/cache@v4
+      with:
+        path: |
+          build
+          ~/.cmake
+        key: ${{ runner.os }}-cmake-${{ hashFiles('CMakeLists.txt', 'abieos/**') }}
+        restore-keys: |
+          ${{ runner.os }}-cmake-
 
     # Setup Node.js
     - name: Use Node.js ${{ matrix.node-version }}
@@ -28,7 +41,42 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: npm ci
-    - run: npm run build:linux
-    - run: npm run build
-    - run: npm run test
+
+    # Install dependencies
+    - name: Install dependencies
+      run: npm ci
+
+    # Build native module
+    - name: Build Linux native module
+      run: npm run build:linux
+
+    # Build TypeScript
+    - name: Build TypeScript
+      run: npm run build
+
+    # Run tests
+    - name: Run tests
+      run: npm test
+
+    - name: Run coverage tests
+      if: matrix.node-version == '22.x'
+      run: npm run test:coverage
+
+    - name: Upload coverage to Coveralls
+      if: matrix.node-version == '22.x'
+      uses: coverallsapp/github-action@v2
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+
+    # Upload build artifacts on failure for debugging
+    - name: Upload build logs on failure
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-logs-node-${{ matrix.node-version }}
+        path: |
+          build/**/*.log
+          npm-debug.log*
+        if-no-files-found: ignore

@@ -21,7 +21,7 @@
     "build:linux": "cmake-js compile && node scripts/copy-module.mjs",
     "build": "tsup",
     "test": "node --test test/**/*.test.js",
-    "test:coverage": "node --test --experimental-test-coverage test/**/*.test.js",
+  "test:coverage": "c8 --reporter=text --reporter=lcov node --test test/**/*.test.js",
     "test:watch": "node --test --watch --experimental-test-coverage test/**/*.test.js",
     "tsc:watch": "tsc --watch",
     "clean": "cmake-js clean",
@@ -43,7 +43,8 @@
     "@microsoft/api-extractor": "7.52.13",
     "@wharfkit/antelope": "^1.1.1",
     "@types/node":"24.6.0",
-    "cmake-js":"7.3.1",
+  "c8": "9.1.0",
+  "cmake-js":"7.3.1",
     "node-addon-api": "8.5.0",
     "tsup": "^8.5.0",
     "typescript": "5.9.2"

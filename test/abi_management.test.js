@@ -150,6 +150,22 @@ test.describe('ABI Management', () => {
         assert.ok(loadedAbis.includes(contractAccount), 'Contract ABI should be in loaded ABIs');
     });
 
+    test('loadAbiHex should log when updating an already loaded contract', () => {
+        const abiHex = eosioTokenAbiBuffer.toString('hex');
+        const originalInfo = console.info;
+        let infoCalled = false;
+        console.info = () => {
+            infoCalled = true;
+        };
+        try {
+            abieos.loadAbiHex(contractAccount, abiHex);
+            abieos.loadAbiHex(contractAccount, abiHex);
+            assert.ok(infoCalled, 'Updating an already loaded ABI should log informational message');
+        } finally {
+            console.info = originalInfo;
+        }
+    });
+
     test('getTypeForAction should return the correct type for a given action', () => {
         abieos.loadAbi(contractAccount, simpleABI);
         const actionType = abieos.getTypeForAction(contractAccount, "transfer");

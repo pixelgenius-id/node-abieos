@@ -3,6 +3,7 @@
 ![CI](https://github.com/eosrio/node-abieos/actions/workflows/build.yml/badge.svg)
 ![Node-API v9 Badge](https://github.com/nodejs/abi-stable-node/blob/doc/assets/Node-API%20v9%20Badge.svg)
 [![NPM version](https://img.shields.io/npm/v/@eosrio/node-abieos.svg?style=flat)](https://www.npmjs.com/package/@eosrio/node-abieos)
+[![Coverage Status](https://coveralls.io/repos/github/eosrio/node-abieos/badge.svg?branch=master)](https://coveralls.io/github/eosrio/node-abieos?branch=master)
 
 Node.js native binding for [abieos](https://github.com/AntelopeIO/abieos), with some improvements:
 

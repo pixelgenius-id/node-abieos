@@ -92,4 +92,32 @@ test.describe('Deserialization (hexTojson)', () => {
         );
     });
 
+    test('hexToJson should wrap parse errors from native response', () => {
+        const originalHexToJson = Abieos.native.hex_to_json;
+        Abieos.native.hex_to_json = () => '{invalid json';
+        try {
+            assert.throws(
+                () => abieos.hexToJson(contractAccount, "transfer", validHex),
+                (err) => err.message.includes('Failed to parse JSON string from hex'),
+                'Should wrap JSON.parse errors when native returns invalid JSON'
+            );
+        } finally {
+            Abieos.native.hex_to_json = originalHexToJson;
+        }
+    });
+
+    test('binToJson should wrap parse errors from native response', () => {
+        const originalBinToJson = Abieos.native.bin_to_json;
+        Abieos.native.bin_to_json = () => '{invalid json';
+        try {
+            assert.throws(
+                () => abieos.binToJson(contractAccount, "transfer", Buffer.from(validHex, 'hex')),
+                (err) => err.message.includes('Failed to parse JSON string from binary'),
+                'Should wrap JSON.parse errors when native returns invalid JSON'
+            );
+        } finally {
+            Abieos.native.bin_to_json = originalBinToJson;
+        }
+    });
+
 });
