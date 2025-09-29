@@ -29,7 +29,7 @@ endif()
 find_package(Threads)
 include(GNUInstallDirs)
 
-add_library(abieos STATIC abieos/src/abi.cpp abieos/src/crypto.cpp abieos/include/eosio/fpconv.c)
+add_library(abieos STATIC abieos/src/abi.cpp abieos/src/crypto.cpp)
 target_include_directories(abieos PUBLIC abieos/include abieos/external/rapidjson/include)
 
 if(ABIEOS_NO_INT128)
