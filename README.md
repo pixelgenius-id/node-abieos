@@ -1,89 +1,109 @@
+
 # node-abieos
 
-![CI](https://github.com/eosrio/node-abieos/actions/workflows/build.yml/badge.svg)
-![Node-API v9 Badge](https://github.com/nodejs/abi-stable-node/blob/doc/assets/Node-API%20v9%20Badge.svg)
-[![NPM version](https://img.shields.io/npm/v/@eosrio/node-abieos.svg?style=flat)](https://www.npmjs.com/package/@eosrio/node-abieos)
-[![Coverage Status](https://coveralls.io/repos/github/eosrio/node-abieos/badge.svg?branch=master)](https://coveralls.io/github/eosrio/node-abieos?branch=master)
+![CI](https://github.com/pixelgenius-id/node-abieos/actions/workflows/build.yml/badge.svg)
+![Node-API v9 Badge](https://raw.githubusercontent.com/nodejs/abi-stable-node/doc/assets/Node-API%20v9%20Badge.svg)
+[![NPM version](https://img.shields.io/npm/v/@pixelgeniusid/node-abieos.svg?style=flat)](https://www.npmjs.com/package/@pixelgeniusid/node-abieos)
+[![GitHub forks](https://img.shields.io/github/forks/pixelgenius-id/node-abieos?style=social)](https://github.com/pixelgenius-id/node-abieos/network/members)
+[![GitHub stars](https://img.shields.io/github/stars/pixelgenius-id/node-abieos?style=social)](https://github.com/pixelgenius-id/node-abieos/stargazers)
 
-Node.js native binding for [abieos](https://github.com/AntelopeIO/abieos), with some improvements:
+---
 
-- Internal loaded contract map
-- deleteContract: to remove the loaded contract from memory (now in vanilla abieos too)
+## Overview
 
-Made with ♥ by [EOS Rio](https://eosrio.io/)
+`node-abieos` is a Node.js native binding for [abieos](https://github.com/AntelopeIO/abieos).  
+This fork is maintained by [pixelgenius-id](https://github.com/pixelgenius-id) to support the **Vexanium Blockchain**, while keeping compatibility with the original project.
 
-----
-**Only Linux is supported for now**
+✨ Improvements / Features:
+- Internal loaded contract map  
+- `deleteContract`: remove the loaded contract from memory (also available in vanilla abieos)  
+- Extended support for Vexanium use cases  
 
-- Typescript typings included
-- Prebuilt binary included (Clang 18 required to build)
-- Now supports NodeJS, Deno, and Bun runtimes.
+---
 
-## Install
+## Attribution
 
-```shell script
-npm i @eosrio/node-abieos --save
+This project was **originally created by [EOS Rio](https://eosrio.io/)** under [eosrio/node-abieos](https://github.com/eosrio/node-abieos).  
+All credit to the original authors — this fork builds on their excellent work. ❤️  
+
+---
+
+## ⚡ Platform Support
+
+- **Linux only** (for now)  
+- TypeScript typings included  
+- Prebuilt binaries included (Clang 18 required to build from source)  
+
+---
+
+## 📦 Installation
+
+```bash
+npm i @pixelgeniusid/node-abieos --save
 ```
 
-## Usage
+----------
 
-CommonJS
+## **🛠 Usage**
 
-```js
-const nodeAbieos = require('@eosrio/node-abieos');
+  
+
+### **CommonJS**
+
+```
+const nodeAbieos = require('@pixelgeniusid/node-abieos');
 ```
 
-ES Modules (NodeJS, Bun)
+### **ES Modules**
 
-```typescript
-import {Abieos} from "@eosrio/node-abieos";
+```
+import { Abieos } from "@pixelgeniusid/node-abieos";
 const abieos = Abieos.getInstance();
 ```
 
-Deno
+Check the  [/examples](https://github.com/eosrio/node-abieos/tree/master/examples)  folder from the original repo for implementation examples.
 
-```bash
-# examples/basic.cjs can be run with:
-deno run --allow-ffi --allow-read examples/basic.cjs
+----------
 
-# For an example using the published npm package with Deno:
-# Check the examples/deno-abieos-test folder
-cd examples/deno-abieos-test
-deno run --allow-ffi --allow-read main.ts
+## **🔨 Building from Source**
+
+  
+
+Make sure you have  **Clang 18**  installed:
+
 ```
-
-Bun
-
-```shell script
-# examples/basic.mjs can be run with:
-bun run examples/basic.mjs
-```
-
-Check the [/examples](https://github.com/eosrio/node-abieos/tree/master/examples) folder for implementation examples
-
-## Building
-
-Make sure you have Clang installed on your system:
-We recommend using Clang 18 to build the `abieos` C++ library.
-
-```bash
 wget https://apt.llvm.org/llvm.sh
 chmod +x llvm.sh
 sudo ./llvm.sh 18
 ```
 
-Clone and Build
+Clone and build:
 
-```shell script
-git clone https://github.com/eosrio/node-abieos.git --recursive
+```
+git clone https://github.com/pixelgenius-id/node-abieos.git --recursive
 cd node-abieos
 npm install
 npm run build:linux
 npm run build
 ```
 
-### Documentation
+----------
 
-For detailed and user-friendly documentation, including installation, usage, API reference, error handling, debugging, and examples, please refer to the [documentation](docs/README.md).
+## **📖 Documentation**
 
-For contribution guidelines and developer documentation, refer to the [contribution guidelines](docs/CONTRIBUTING.md).
+  
+
+For detailed documentation (installation, usage, API reference, error handling, debugging, and examples), see:
+
+-   [Documentation](docs/README.md)
+    
+-   [Contribution Guidelines](docs/CONTRIBUTING.md)
+    
+
+----------
+
+## **❤️ Credits**
+
+-   Original work:  [eosrio/node-abieos](https://github.com/eosrio/node-abieos)  by  [EOS Rio](https://eosrio.io/)
+    
+-   Fork & Vexanium Support:  [pixelgenius-id](https://github.com/pixelgenius-id)
