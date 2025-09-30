@@ -61,7 +61,7 @@ import { Abieos } from "@pixelgeniusid/node-abieos";
 const abieos = Abieos.getInstance();
 ```
 
-Check the  [/examples](https://github.com/eosrio/node-abieos/tree/master/examples)  folder from the original repo for implementation examples.
+Check the  [/examples](https://github.com/pixelgenius-id/node-abieos/tree/master/examples)  folder from the original repo for implementation examples.
 
 ----------
 
