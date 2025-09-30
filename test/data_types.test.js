@@ -40,7 +40,7 @@ test.describe('Specific Data Type Serialization/Deserialization', () => {
             f_int8: -128,
             f_uint8: 255,
             f_string: "hello world",
-            f_name: "eosio.token"
+            f_name: "vex.token"
         };
 
         const hex = abieos.jsonToHex(contract, 'basic_types', basicTypesData);

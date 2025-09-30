@@ -3,8 +3,8 @@
   "specifiers": {
     "jsr:@std/assert@1": "1.0.13",
     "jsr:@std/internal@^1.0.6": "1.0.7",
-    "npm:@eosrio/node-abieos@*": "4.0.2-2039717",
-    "npm:@eosrio/node-abieos@^4.0.2-2039717": "4.0.2-2039717"
+    "npm:@pixelgeniusid/node-abieos@*": "4.0.2",
+    "npm:@pixelgeniusid/node-abieos@^4.0.2": "4.0.2"
   },
   "jsr": {
     "@std/assert@1.0.13": {
@@ -18,15 +18,15 @@
     }
   },
   "npm": {
-    "@eosrio/node-abieos@4.0.2-2039717": {
-      "integrity": "sha512-KYgjVLaJcxJIBtcjbTh1ROgiCe5Ty38E3BsgYZWv02d0S4Bc0ryxsngX+aIStxWsG7NlDaX9or9qBVil1MO7Tg==",
+    "@pixelgeniusid/node-abieos@4.0.2": {
+      "integrity": "sha512-b1LfuX3mGt1IzbRJyQltDakbwlg18x3+C6f29B5GEE8m1vaBxr3WlQKZKkGz9VGDtucJz3y6H5PHR+tY49EOzA==",
       "scripts": true
     }
   },
   "workspace": {
     "dependencies": [
       "jsr:@std/assert@1",
-      "npm:@eosrio/node-abieos@^4.0.2-2039717"
+      "npm:@pixelgeniusid/node-abieos@^4.0.2"
     ]
   }
 }

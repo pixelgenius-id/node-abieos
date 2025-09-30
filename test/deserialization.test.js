@@ -24,7 +24,7 @@ test.describe('Deserialization (hexTojson)', () => {
     const transferActionData = {
         from: "alice",
         to: "bob",
-        quantity: "1.0000 EOS",
+        quantity: "1.0000 VEX",
         memo: "test transfer"
     };
     let validHex;

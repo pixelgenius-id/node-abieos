@@ -1,5 +1,5 @@
-import {Abieos} from "@eosrio/node-abieos";
-import {ABI, Serializer} from "@wharfkit/antelope";
+const {Abieos} = require('@pixelgeniusid/node-abieos');
+import {ABI, Serializer} from "@pixelgeniusid/antelope";
 
 const abieos = Abieos.getInstance();
 

@@ -6,7 +6,7 @@ Thank you for considering contributing to the node-abieos project! We welcome co
 
 ### Reporting Issues
 
-If you encounter any issues or bugs while using node-abieos, please report them by creating a new issue in the [GitHub issue tracker](https://github.com/eosrio/node-abieos/issues). When reporting an issue, please provide as much detail as possible, including:
+If you encounter any issues or bugs while using node-abieos, please report them by creating a new issue in the [GitHub issue tracker](https://github.com/pixelgenius-id/node-abieos/issues). When reporting an issue, please provide as much detail as possible, including:
 
 - A clear and descriptive title
 - A detailed description of the issue
@@ -59,7 +59,7 @@ We expect all contributors to adhere to the [Code of Conduct](CODE_OF_CONDUCT.md
 
 ### Getting Help
 
-If you need help or have any questions about contributing to node-abieos, feel free to reach out by creating a new issue in the [GitHub issue tracker](https://github.com/eosrio/node-abieos/issues) or by joining our community discussions.
+If you need help or have any questions about contributing to node-abieos, feel free to reach out by creating a new issue in the [GitHub issue tracker](https://github.com/pixelgenius-id/node-abieos/issues) or by joining our community discussions.
 
 Thank you for your contributions and support!
 

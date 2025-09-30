@@ -3,7 +3,7 @@ import test from 'node:test';
 import { Abieos } from '../dist/abieos.js';
 import { assertThrows, testRoundTrip as globalTestRoundTrip } from './utils/test-helpers.js';
 
-test.describe('EOSIO Specific Types', () => {
+test.describe('VEXANIUM Specific Types', () => {
     const abieos = Abieos.getInstance();
 
     const contract = 'eosio.types';
@@ -42,7 +42,7 @@ test.describe('EOSIO Specific Types', () => {
     abieos.loadAbi(contract, eosioTypesAbi);
 
     test('simple stringToName conversion', () => {
-        const nameValue = abieos.stringToName("eosio.token");
+        const nameValue = abieos.stringToName("vex.token");
         assert.ok(typeof nameValue === 'bigint', 'stringToName should return a BigInt');
     });
 
@@ -55,19 +55,19 @@ test.describe('EOSIO Specific Types', () => {
     });
 
     test('name type serialization/deserialization', () => {
-        globalTestRoundTrip(abieos, contract, 'name_type', { value: "eosio" });
-        globalTestRoundTrip(abieos, contract, 'name_type', { value: "eosio.token" });
-        globalTestRoundTrip(abieos, contract, 'name_type', { value: "eosio.null" });
+        globalTestRoundTrip(abieos, contract, 'name_type', { value: "vexcore" });
+        globalTestRoundTrip(abieos, contract, 'name_type', { value: "vex.token" });
+        globalTestRoundTrip(abieos, contract, 'name_type', { value: "vex.null" });
         globalTestRoundTrip(abieos, contract, 'name_type', { value: "" });
         globalTestRoundTrip(abieos, contract, 'name_type', { value: "a" });
         globalTestRoundTrip(abieos, contract, 'name_type', { value: "zzzzzzzzzzzzj" });
     });
 
     test('asset type serialization/deserialization', () => {
-        globalTestRoundTrip(abieos, contract, 'asset_type', { value: "1.0000 EOS" });
-        globalTestRoundTrip(abieos, contract, 'asset_type', { value: "0.0000 EOS" });
-        globalTestRoundTrip(abieos, contract, 'asset_type', { value: "-1.0000 EOS" });
-        globalTestRoundTrip(abieos, contract, 'asset_type', { value: "1000000000.0000 EOS" });
+        globalTestRoundTrip(abieos, contract, 'asset_type', { value: "1.0000 VEX" });
+        globalTestRoundTrip(abieos, contract, 'asset_type', { value: "0.0000 VEX" });
+        globalTestRoundTrip(abieos, contract, 'asset_type', { value: "-1.0000 VEX" });
+        globalTestRoundTrip(abieos, contract, 'asset_type', { value: "1000000000.0000 VEX" });
     });
 
     test('time types serialization/deserialization', () => {
@@ -96,13 +96,13 @@ test.describe('EOSIO Specific Types', () => {
     });
 
     test('public key serialization/deserialization', () => {
-        const eosKey = "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV";
+        const eosKey = "VEX6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV";
         const data = { value: eosKey };
 
         const hex = abieos.jsonToHex(contract, 'public_key_type', data);
         const result = abieos.hexToJson(contract, 'public_key_type', hex);
 
-        let isValidFormat = result.value.startsWith('PUB_K1_') || result.value.startsWith('EOS');
+        let isValidFormat = result.value.startsWith('PUB_K1_') || result.value.startsWith('VEX');
         if (eosKey.startsWith('PUB_K1_')) {
             isValidFormat = result.value.startsWith('PUB_K1_');
         }
@@ -116,7 +116,7 @@ test.describe('EOSIO Specific Types', () => {
 
         assertThrows(
             /Failed to convert JSON to hex.*Expected key/i,
-            () => abieos.jsonToHex(contract, 'public_key_type', { value: "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CZ" }),
+            () => abieos.jsonToHex(contract, 'public_key_type', { value: "VEX6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CZ" }),
             'Should reject public key with invalid checksum'
         );
     });

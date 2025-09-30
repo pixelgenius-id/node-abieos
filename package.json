@@ -1,5 +1,5 @@
 {
-  "name": "@eosrio/node-abieos",
+  "name": "@pixelgeniusid/node-abieos",
   "version": "4.0.3-f7d5b45",
   "publishConfig": {
     "access": "public",
@@ -31,17 +31,20 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/eosrio/node-abieos.git"
+    "url": "git+https://github.com/pixelgenius-id/node-abieos.git"
   },
-  "author": "EOS Rio",
+  "author": "pixelgenius-id",
+  "contributors": [
+    "EOS Rio"
+  ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/eosrio/node-abieos/issues"
+    "url": "https://github.com/pixelgenius-id/node-abieos/issues"
   },
-  "homepage": "https://github.com/eosrio/node-abieos#readme",
+  "homepage": "https://github.com/pixelgenius-id/node-abieos#readme",
   "devDependencies": {
     "@microsoft/api-extractor": "7.52.13",
-    "@wharfkit/antelope": "^1.1.1",
+    "@pixelgeniusid/antelope": "^1.1.5",
     "@types/node": "24.6.0",
     "c8": "9.1.0",
     "cmake-js": "7.3.1",
